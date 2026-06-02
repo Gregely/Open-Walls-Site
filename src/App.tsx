@@ -1,7 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { MotifStack } from './components/MotifStack';
-import { aboutCopy, contact, mailto, pastShows, upcomingShow } from './data/content';
+import { AdminPage } from './admin/AdminPage';
+import { instagramHandle, mailto } from './data/content';
+import { loadContent } from './lib/contentApi';
+import type { SiteContent } from './types/content';
 
 function PlacedMotif({
   x,
@@ -39,7 +42,7 @@ function PlacedMotif({
   );
 }
 
-function useProgressiveMotion() {
+function useProgressiveMotion(content: SiteContent) {
   useEffect(() => {
     const root = document.documentElement;
     const revealEls = Array.from(document.querySelectorAll<HTMLElement>('.reveal'));
@@ -97,17 +100,32 @@ function useProgressiveMotion() {
       window.clearTimeout(safety);
       root.classList.remove('anim');
     };
-  }, []);
+  }, [content]);
 }
 
-function Nav() {
+function splitHeroTitle(title: string) {
+  const words = title.trim().split(/\s+/).filter(Boolean);
+  if (words.length <= 1) return [title, ''];
+  return [words.slice(0, -1).join(' '), words[words.length - 1]];
+}
+
+function paragraphs(text: string) {
+  return text
+    .split(/\n{2,}/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
+}
+
+function Nav({ content }: { content: SiteContent }) {
+  const { settings, upcomingShow } = content;
+
   return (
     <header className="nav">
-      <a className="nav__brand" href="#top" aria-label="Open Walls home">
+      <a className="nav__brand" href="#top" aria-label={`${settings.siteName} home`}>
         <span className="mark">
           <MotifStack size={30} seed={88} layers={4} jitter={6} baseRot={-8} />
         </span>
-        <span>Open Walls</span>
+        <span>{settings.siteName}</span>
       </a>
       <nav className="nav__links" aria-label="Sections">
         <a href="#upcoming" data-link="upcoming">
@@ -120,14 +138,18 @@ function Nav() {
           About
         </a>
       </nav>
-      <a className="nav__cta" href={mailto('Open Walls - artist application')}>
+      <a className="nav__cta" href={mailto(settings.contactEmail, upcomingShow.ctaEmailSubject, upcomingShow.ctaEmailBody)}>
         Get a spot
       </a>
     </header>
   );
 }
 
-function Hero() {
+function Hero({ content }: { content: SiteContent }) {
+  const { settings, upcomingShow } = content;
+  const [titleOne, titleTwo] = splitHeroTitle(settings.heroTitle || upcomingShow.date);
+  const venueLine = [upcomingShow.venue, upcomingShow.location].filter(Boolean).join(' · ');
+
   return (
     <section className="hero" id="upcoming" aria-labelledby="upcoming-title">
       <div className="hero__motifs" aria-hidden="true">
@@ -137,41 +159,38 @@ function Hero() {
         <PlacedMotif x={64} y={80} size={92} seed={404} jitter={10} />
         <PlacedMotif x={30} y={4} size={70} seed={505} jitter={11} />
       </div>
-      <div className="badge-free">
-        <span>
-          Free
-          <br />
-          Entry
-        </span>
-      </div>
+      {upcomingShow.freeEntry && (
+        <div className="badge-free">
+          <span>
+            Free
+            <br />
+            Entry
+          </span>
+        </div>
+      )}
       <div className="wrap hero__inner">
         <div className="hero__top">
           <span className="tag reveal">{upcomingShow.volume}</span>
           <span className="eyebrow reveal" data-d="1">
-            {upcomingShow.eyebrow}
+            {settings.tagline}
           </span>
         </div>
-        <h1
-          id="upcoming-title"
-          className="hero__date display reveal"
-          data-d="1"
-          aria-label={`${upcomingShow.dateLineOne} ${upcomingShow.dateLineTwo}`}
-        >
-          <span className="ln c-red">{upcomingShow.dateLineOne}</span>
-          <span className="ln c-purple">{upcomingShow.dateLineTwo}</span>
+        <h1 id="upcoming-title" className="hero__date display reveal" data-d="1" aria-label={settings.heroTitle}>
+          <span className="ln c-red">{titleOne}</span>
+          {titleTwo && <span className="ln c-purple">{titleTwo}</span>}
         </h1>
         <div className="hero__time display reveal" data-d="2">
           {upcomingShow.time}
         </div>
         <div className="hero__venue reveal" data-d="2">
-          {upcomingShow.venue}
+          {venueLine}
         </div>
         <p className="hero__desc reveal" data-d="3">
-          {upcomingShow.description}
+          {settings.heroBody || upcomingShow.description}
         </p>
         <div className="hero__cta reveal" data-d="3">
-          <a className="btn btn--primary" href={mailto(`${upcomingShow.volume} - artist application`)}>
-            Get your spot <span className="arrow">-&gt;</span>
+          <a className="btn btn--primary" href={mailto(settings.contactEmail, upcomingShow.ctaEmailSubject, upcomingShow.ctaEmailBody)}>
+            {upcomingShow.ctaLabel} <span className="arrow">-&gt;</span>
           </a>
           <a className="btn btn--ghost" href="#about">
             Find out more
@@ -202,7 +221,9 @@ function MotifDivider() {
   );
 }
 
-function PastShows() {
+function PastShows({ content }: { content: SiteContent }) {
+  const { settings, pastShows } = content;
+
   return (
     <section className="section section--tint" id="past" aria-labelledby="past-title">
       <div className="wrap">
@@ -211,19 +232,20 @@ function PastShows() {
             Past Shows
           </h2>
           <p className="blurb reveal" data-d="1">
-            Eleven rooms filled so far. Different walls every month, same idea - get the work out where people are.
+            Different walls every month, same idea - get the work out where people are.
           </p>
         </div>
         <div className="grid">
           {pastShows.map((show, index) => {
-            const subject = `Open Walls ${show.volume} - ${show.date} at ${show.location}`;
+            const place = [show.venue, show.location].filter(Boolean).join(' · ');
+            const subject = `Open Walls ${show.volume} - ${show.date} at ${place}`;
             return (
               <a
-                key={`${show.volume}-${show.date}`}
+                key={show.id}
                 className="card reveal"
                 data-d={String((index % 3) + 1)}
-                href={mailto(subject)}
-                aria-label={`Ask about ${show.volume}, ${show.date}, ${show.location}`}
+                href={mailto(settings.contactEmail, subject)}
+                aria-label={`Ask about ${show.volume}, ${show.date}, ${place}`}
                 style={{ '--card-accent': show.accent } as CSSProperties}
               >
                 <span className="card__vol">{show.volume}</span>
@@ -231,7 +253,7 @@ function PastShows() {
                   <MotifStack size={118} seed={show.seed} layers={5} jitter={8} />
                 </span>
                 <span className="card__date">{show.date}</span>
-                <span className="card__loc">{show.location}</span>
+                <span className="card__loc">{place}</span>
               </a>
             );
           })}
@@ -241,27 +263,29 @@ function PastShows() {
   );
 }
 
-function About() {
+function About({ content }: { content: SiteContent }) {
+  const { settings } = content;
+
   return (
     <section className="section" id="about" aria-labelledby="about-title">
       <div className="wrap about__grid">
         <div>
           <h2 id="about-title" className="about__lead display reveal">
-            A wall is just a gallery that hasn't been asked yet.
+            {settings.aboutTitle}
           </h2>
           <div className="about__body reveal" data-d="1">
-            {aboutCopy.map((paragraph) => (
+            {paragraphs(settings.aboutBody).map((paragraph) => (
               <p key={paragraph}>{paragraph}</p>
             ))}
           </div>
           <div className="contact reveal" data-d="2">
-            <a href={mailto()}>
+            <a href={mailto(settings.contactEmail)}>
               <span className="ico">@</span>
-              {contact.email}
+              {settings.contactEmail}
             </a>
-            <a href={contact.instagramUrl} target="_blank" rel="noopener noreferrer">
+            <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer">
               <span className="ico">#</span>
-              {contact.instagramHandle}
+              {instagramHandle(settings.instagramUrl)}
             </a>
           </div>
         </div>
@@ -273,7 +297,9 @@ function About() {
   );
 }
 
-function Footer() {
+function Footer({ content }: { content: SiteContent }) {
+  const { settings } = content;
+
   return (
     <footer className="footer">
       <div className="footer__motifs" aria-hidden="true">
@@ -283,35 +309,77 @@ function Footer() {
         <PlacedMotif x={70} y={4} size={60} seed={94} jitter={11} />
       </div>
       <div className="wrap">
-        <div className="footer__mark display">Open Walls</div>
+        <div className="footer__mark display">{settings.siteName}</div>
         <nav className="footer__row" aria-label="Footer">
           <a href="#upcoming">Upcoming</a>
           <a href="#past">Past Shows</a>
           <a href="#about">About</a>
-          <a href={mailto()}>{contact.email}</a>
-          <a href={contact.instagramUrl} target="_blank" rel="noopener noreferrer">
-            {contact.instagramHandle}
+          <a href={mailto(settings.contactEmail)}>{settings.contactEmail}</a>
+          <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer">
+            {instagramHandle(settings.instagramUrl)}
           </a>
         </nav>
-        <div className="footer__fine">Cork, Ireland · Monthly · Free entry · Bring a friend.</div>
+        <div className="footer__fine">{settings.footerText}</div>
       </div>
     </footer>
   );
 }
 
-export function App() {
-  useProgressiveMotion();
+function PublicSite() {
+  const [loadResult, setLoadResult] = useState<Awaited<ReturnType<typeof loadContent>> | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    loadContent(false).then((result) => {
+      if (alive) setLoadResult(result);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const content = loadResult?.content;
+
+  useEffect(() => {
+    if (content?.settings.siteName) {
+      document.title = `${content.settings.siteName} Cork`;
+    }
+  }, [content]);
+
+  if (!content) {
+    return (
+      <div className="site-loading">
+        <MotifStack size={84} seed={88} layers={4} jitter={7} />
+        <span>Loading Open Walls</span>
+      </div>
+    );
+  }
+
+  return <RenderedSite content={content} fallbackWarning={import.meta.env.DEV && loadResult.source === 'fallback' ? loadResult.error : undefined} />;
+}
+
+function RenderedSite({ content, fallbackWarning }: { content: SiteContent; fallbackWarning?: string }) {
+  useProgressiveMotion(content);
 
   return (
     <>
-      <Nav />
+      <Nav content={content} />
+      {fallbackWarning && <div className="content-warning">Showing fallback content. {fallbackWarning}</div>}
       <main id="top">
-        <Hero />
+        <Hero content={content} />
         <MotifDivider />
-        <PastShows />
-        <About />
+        <PastShows content={content} />
+        <About content={content} />
       </main>
-      <Footer />
+      <Footer content={content} />
     </>
   );
+}
+
+export function App() {
+  if (window.location.pathname.startsWith('/admin')) {
+    return <AdminPage />;
+  }
+
+  return <PublicSite />;
 }

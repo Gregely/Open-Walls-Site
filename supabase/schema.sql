@@ -1,0 +1,215 @@
+create extension if not exists pgcrypto;
+
+create table if not exists public.site_settings (
+  id text primary key default 'default',
+  site_name text not null,
+  tagline text not null default '',
+  hero_title text not null,
+  hero_body text not null,
+  about_title text not null,
+  about_body text not null default '',
+  contact_email text not null,
+  instagram_url text not null default '',
+  footer_text text not null default '',
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.upcoming_show (
+  id text primary key default 'current',
+  volume text not null,
+  date text not null,
+  time text not null,
+  venue text not null,
+  location text not null default '',
+  description text not null default '',
+  free_entry boolean not null default true,
+  artists jsonb not null default '[]'::jsonb,
+  cta_label text not null default 'Get your spot',
+  cta_email_subject text not null default '',
+  cta_email_body text not null default '',
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.past_shows (
+  id text primary key default gen_random_uuid()::text,
+  volume text not null,
+  date text not null,
+  venue text not null,
+  location text not null default '',
+  artists jsonb not null default '[]'::jsonb,
+  notes text not null default '',
+  display_order integer not null default 0,
+  visible boolean not null default true,
+  accent text not null default '#d94f2b',
+  seed integer not null default 1,
+  updated_at timestamptz not null default now()
+);
+
+create or replace function public.set_updated_at()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+drop trigger if exists site_settings_updated_at on public.site_settings;
+create trigger site_settings_updated_at
+before update on public.site_settings
+for each row execute function public.set_updated_at();
+
+drop trigger if exists upcoming_show_updated_at on public.upcoming_show;
+create trigger upcoming_show_updated_at
+before update on public.upcoming_show
+for each row execute function public.set_updated_at();
+
+drop trigger if exists past_shows_updated_at on public.past_shows;
+create trigger past_shows_updated_at
+before update on public.past_shows
+for each row execute function public.set_updated_at();
+
+alter table public.site_settings enable row level security;
+alter table public.upcoming_show enable row level security;
+alter table public.past_shows enable row level security;
+
+drop policy if exists "Public can read site settings" on public.site_settings;
+create policy "Public can read site settings"
+on public.site_settings
+for select
+to anon, authenticated
+using (true);
+
+drop policy if exists "Public can read upcoming show" on public.upcoming_show;
+create policy "Public can read upcoming show"
+on public.upcoming_show
+for select
+to anon, authenticated
+using (true);
+
+drop policy if exists "Public can read visible past shows" on public.past_shows;
+create policy "Public can read visible past shows"
+on public.past_shows
+for select
+to anon, authenticated
+using (visible = true or auth.role() = 'authenticated');
+
+drop policy if exists "Authenticated users can manage site settings" on public.site_settings;
+create policy "Authenticated users can manage site settings"
+on public.site_settings
+for all
+to authenticated
+using (true)
+with check (true);
+
+drop policy if exists "Authenticated users can manage upcoming show" on public.upcoming_show;
+create policy "Authenticated users can manage upcoming show"
+on public.upcoming_show
+for all
+to authenticated
+using (true)
+with check (true);
+
+drop policy if exists "Authenticated users can manage past shows" on public.past_shows;
+create policy "Authenticated users can manage past shows"
+on public.past_shows
+for all
+to authenticated
+using (true)
+with check (true);
+
+insert into public.site_settings (
+  id,
+  site_name,
+  tagline,
+  hero_title,
+  hero_body,
+  about_title,
+  about_body,
+  contact_email,
+  instagram_url,
+  footer_text
+) values (
+  'default',
+  'Open Walls',
+  'Monthly exhibition + maker''s market · Cork',
+  'Sat 28 June',
+  'One room, one day, wall to wall. Twenty-odd Cork artists hang original work, prints and zines beside a maker''s market - with coffee, records and the odd pint. Roll in, look around, take something home.',
+  'A wall is just a gallery that hasn''t been asked yet.',
+  'Open Walls is a Cork-based visual art collective. Once a month we borrow a room somewhere in the city and fill it, wall to wall, with work from local artists - paintings, prints, photography, zines - next to a maker''s market and a bit of music.
+
+No white-cube hush, no entry fee, no gatekeeping. If you make things in Cork, there''s a wall here with your name on it.',
+  'openwallscork@gmail.com',
+  'https://instagram.com/openwallscork',
+  'Cork, Ireland · Monthly · Free entry · Bring a friend.'
+) on conflict (id) do update set
+  site_name = excluded.site_name,
+  tagline = excluded.tagline,
+  hero_title = excluded.hero_title,
+  hero_body = excluded.hero_body,
+  about_title = excluded.about_title,
+  about_body = excluded.about_body,
+  contact_email = excluded.contact_email,
+  instagram_url = excluded.instagram_url,
+  footer_text = excluded.footer_text;
+
+insert into public.upcoming_show (
+  id,
+  volume,
+  date,
+  time,
+  venue,
+  location,
+  description,
+  free_entry,
+  artists,
+  cta_label,
+  cta_email_subject,
+  cta_email_body
+) values (
+  'current',
+  'Vol. 12',
+  'Sat 28 June',
+  '12-6pm',
+  'The Guesthouse',
+  'MacCurtain St, Cork',
+  'One room, one day, wall to wall. Twenty-odd Cork artists hang original work, prints and zines beside a maker''s market - with coffee, records and the odd pint. Roll in, look around, take something home.',
+  true,
+  '["Thady Tra", "Evan Stout", "Andrew Carroll", "Victoria Cialkosz", "Isabel Quinn", "Sachiko Kobayashi", "+ many more"]'::jsonb,
+  'Get your spot',
+  'Open Walls Vol. 12 - artist application',
+  ''
+) on conflict (id) do update set
+  volume = excluded.volume,
+  date = excluded.date,
+  time = excluded.time,
+  venue = excluded.venue,
+  location = excluded.location,
+  description = excluded.description,
+  free_entry = excluded.free_entry,
+  artists = excluded.artists,
+  cta_label = excluded.cta_label,
+  cta_email_subject = excluded.cta_email_subject,
+  cta_email_body = excluded.cta_email_body;
+
+insert into public.past_shows (id, volume, date, venue, location, artists, notes, display_order, visible, accent, seed) values
+  ('vol-11', 'Vol. 11', 'May 2026', 'Nash 19', 'Princes St', '[]'::jsonb, '', 10, true, '#d94f2b', 12),
+  ('vol-10', 'Vol. 10', 'Apr 2026', 'The Guesthouse', 'MacCurtain', '[]'::jsonb, '', 20, true, '#2aa8a0', 7),
+  ('vol-9', 'Vol. 9', 'Mar 2026', 'Plugd Records', 'Triskel', '[]'::jsonb, '', 30, true, '#f4821f', 23),
+  ('vol-8', 'Vol. 8', 'Feb 2026', 'The Kino', 'Washington St', '[]'::jsonb, '', 40, true, '#5b4fa0', 41),
+  ('vol-7', 'Vol. 7', 'Jan 2026', 'Sample Studios', 'Churchfield', '[]'::jsonb, '', 50, true, '#2b9fd4', 5),
+  ('vol-6', 'Vol. 6', 'Dec 2025', 'The Roundy', 'Castle St', '[]'::jsonb, '', 60, true, '#3fad5c', 33),
+  ('vol-5', 'Vol. 5', 'Nov 2025', 'Cork Coffee Roasters', '', '[]'::jsonb, '', 70, true, '#8c4f8b', 18),
+  ('vol-4', 'Vol. 4', 'Oct 2025', 'Crane Lane', 'Phoenix St', '[]'::jsonb, '', 80, true, '#f5c800', 9)
+on conflict (id) do update set
+  volume = excluded.volume,
+  date = excluded.date,
+  venue = excluded.venue,
+  location = excluded.location,
+  artists = excluded.artists,
+  notes = excluded.notes,
+  display_order = excluded.display_order,
+  visible = excluded.visible,
+  accent = excluded.accent,
+  seed = excluded.seed;

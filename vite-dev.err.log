@@ -1,0 +1,47 @@
+[2m22:53:46[22m [31m[1m[vite][22m[39m [31mInternal server error: Failed to resolve import "./admin/AdminPage" from "src/App.tsx". Does the file exist?[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/gregs/Documents/Open Walls Site/src/App.tsx[39m:4:26
+[33m  18 |  import { useEffect, useState } from "react";
+  19 |  import { MotifStack } from "./components/MotifStack";
+  20 |  import { AdminPage } from "./admin/AdminPage";
+     |                             ^
+  21 |  import { instagramHandle, mailto } from "./data/content";
+  22 |  import { loadContent } from "./lib/contentApi";[39m
+      at TransformPluginContext._formatLog (file:///C:/Users/gregs/Documents/Open%20Walls%20Site/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42658:41)
+      at TransformPluginContext.error (file:///C:/Users/gregs/Documents/Open%20Walls%20Site/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42655:16)
+      at normalizeUrl (file:///C:/Users/gregs/Documents/Open%20Walls%20Site/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:40634:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at async file:///C:/Users/gregs/Documents/Open%20Walls%20Site/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:40753:37
+      at async Promise.all (index 5)
+      at async TransformPluginContext.transform (file:///C:/Users/gregs/Documents/Open%20Walls%20Site/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:40680:7)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/gregs/Documents/Open%20Walls%20Site/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42453:18)
+      at async loadAndTransform (file:///C:/Users/gregs/Documents/Open%20Walls%20Site/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:35845:27)
+      at async viteTransformMiddleware (file:///C:/Users/gregs/Documents/Open%20Walls%20Site/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:37369:24)
+[2m22:53:48[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: Failed to resolve import "./admin/AdminPage" from "src/App.tsx". Does the file exist?
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/gregs/Documents/Open Walls Site/src/App.tsx[39m:4:26
+[33m  18 |  import { useEffect, useState } from "react";
+  19 |  import { MotifStack } from "./components/MotifStack";
+  20 |  import { AdminPage } from "./admin/AdminPage";
+     |                             ^
+  21 |  import { instagramHandle, mailto } from "./data/content";
+  22 |  import { loadContent } from "./lib/contentApi";[39m
+[2m22:53:48[22m [31m[1m[vite][22m[39m [31mInternal server error: Failed to resolve import "./admin/AdminPage" from "src/App.tsx". Does the file exist?[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/gregs/Documents/Open Walls Site/src/App.tsx[39m:4:26
+[33m  18 |  import { useEffect, useState } from "react";
+  19 |  import { MotifStack } from "./components/MotifStack";
+  20 |  import { AdminPage } from "./admin/AdminPage";
+     |                             ^
+  21 |  import { instagramHandle, mailto } from "./data/content";
+  22 |  import { loadContent } from "./lib/contentApi";[39m
+      at TransformPluginContext._formatLog (file:///C:/Users/gregs/Documents/Open%20Walls%20Site/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42658:41)
+      at TransformPluginContext.error (file:///C:/Users/gregs/Documents/Open%20Walls%20Site/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42655:16)
+      at normalizeUrl (file:///C:/Users/gregs/Documents/Open%20Walls%20Site/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:40634:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at async file:///C:/Users/gregs/Documents/Open%20Walls%20Site/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:40753:37
+      at async Promise.all (index 5)
+      at async TransformPluginContext.transform (file:///C:/Users/gregs/Documents/Open%20Walls%20Site/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:40680:7)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/gregs/Documents/Open%20Walls%20Site/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42453:18)
+      at async loadAndTransform (file:///C:/Users/gregs/Documents/Open%20Walls%20Site/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:35845:27)
+      at async viteTransformMiddleware (file:///C:/Users/gregs/Documents/Open%20Walls%20Site/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:37369:24)
