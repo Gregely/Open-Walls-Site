@@ -1,4 +1,5 @@
 create extension if not exists pgcrypto;
+create extension if not exists "uuid-ossp";
 
 create table if not exists public.site_settings (
   id text primary key default 'default',
@@ -72,6 +73,63 @@ drop trigger if exists past_shows_updated_at on public.past_shows;
 create trigger past_shows_updated_at
 before update on public.past_shows
 for each row execute function public.set_updated_at();
+
+-- ── Applications table ────────────────────────────────────────────────────
+-- Stores artist applications submitted via /apply.
+-- Status lifecycle: new → reviewed → accepted / rejected / waitlist
+--
+-- NOTE: If you already ran this schema and are adding applications for the
+-- first time, run the following in the Supabase SQL editor instead:
+--
+--   CREATE TABLE IF NOT EXISTS public.applications ( ... );
+--
+-- The full definition is below.
+
+create table if not exists public.applications (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  -- Required fields (match Google Form required questions)
+  name text not null,
+  phone_number text not null,
+  email text not null,
+  -- Optional fields (may be null if the applicant left them blank)
+  art_type text,
+  work_size_or_count text,
+  display_method text,
+  wants_social_promotion text,   -- 'Yes pleases' | 'No thanku' | null
+  social_username text,
+  other_ideas_or_questions text,
+  -- Admin fields
+  status text not null default 'new',   -- new | reviewed | accepted | rejected | waitlist
+  organiser_notes text
+);
+
+drop trigger if exists applications_updated_at on public.applications;
+create trigger applications_updated_at
+before update on public.applications
+for each row execute function public.set_updated_at();
+
+alter table public.applications enable row level security;
+
+-- Anonymous users can submit applications but cannot read them.
+drop policy if exists "Anyone can submit an application" on public.applications;
+create policy "Anyone can submit an application"
+on public.applications
+for insert
+to anon, authenticated
+with check (true);
+
+-- Only authenticated admin users can read, update, or delete applications.
+drop policy if exists "Authenticated users can manage applications" on public.applications;
+create policy "Authenticated users can manage applications"
+on public.applications
+for all
+to authenticated
+using (true)
+with check (true);
+
+-- ── End applications table ─────────────────────────────────────────────────
 
 alter table public.site_settings enable row level security;
 alter table public.upcoming_show enable row level security;

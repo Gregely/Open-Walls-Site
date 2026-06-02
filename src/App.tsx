@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { MotifStack } from './components/MotifStack';
 import { AdminPage } from './admin/AdminPage';
+import { ApplyPage } from './apply/ApplyPage';
 import { instagramHandle, mailto } from './data/content';
 import { loadContent } from './lib/contentApi';
 import { resolveImageUrl } from './lib/imageUrl';
@@ -118,7 +119,7 @@ function paragraphs(text: string) {
 }
 
 function Nav({ content }: { content: SiteContent }) {
-  const { settings, upcomingShow } = content;
+  const { settings } = content;
 
   return (
     <header className="nav">
@@ -139,9 +140,12 @@ function Nav({ content }: { content: SiteContent }) {
           About
         </a>
       </nav>
-      <a className="nav__cta" href={mailto(settings.contactEmail, upcomingShow.ctaEmailSubject, upcomingShow.ctaEmailBody)}>
-        Get a spot
-      </a>
+      <div className="nav__contact">
+        <a href={mailto(settings.contactEmail)}>Email</a>
+        <a href={settings.instagramUrl} target="_blank" rel="noreferrer">
+          Instagram
+        </a>
+      </div>
     </header>
   );
 }
@@ -190,7 +194,7 @@ function Hero({ content }: { content: SiteContent }) {
           {settings.heroBody || upcomingShow.description}
         </p>
         <div className="hero__cta reveal" data-d="3">
-          <a className="btn btn--primary" href={mailto(settings.contactEmail, upcomingShow.ctaEmailSubject, upcomingShow.ctaEmailBody)}>
+          <a className="btn btn--primary" href="/apply">
             {upcomingShow.ctaLabel} <span className="arrow">-&gt;</span>
           </a>
           <a className="btn btn--ghost" href="#about">
@@ -392,6 +396,10 @@ function RenderedSite({ content, fallbackWarning }: { content: SiteContent; fall
 export function App() {
   if (window.location.pathname.startsWith('/admin')) {
     return <AdminPage />;
+  }
+
+  if (window.location.pathname.startsWith('/apply')) {
+    return <ApplyPage />;
   }
 
   return <PublicSite />;

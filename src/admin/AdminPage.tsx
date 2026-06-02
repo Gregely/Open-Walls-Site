@@ -8,6 +8,7 @@ import type { PastShow, SiteContent } from '../types/content';
 import { MotifStack } from '../components/MotifStack';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { resolveImageUrl, isValidPosterUrl } from '../lib/imageUrl';
+import { ApplicationsSection } from './ApplicationsSection';
 
 type SaveState = 'idle' | 'saving' | 'saved';
 
@@ -322,6 +323,8 @@ export function AdminPage() {
       </header>
 
       {error && <div className="admin-error admin-error--bar">{error}</div>}
+
+      <ApplicationsSection />
 
       <section className="admin-card">
         <div className="admin-section-title">
