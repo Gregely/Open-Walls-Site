@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { CSSProperties } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { MotifStack } from './components/MotifStack';
 import { AdminPage } from './admin/AdminPage';
 import { ApplyPage } from './apply/ApplyPage';
@@ -395,12 +396,27 @@ function RenderedSite({ content, fallbackWarning }: { content: SiteContent; fall
 
 export function App() {
   if (window.location.pathname.startsWith('/admin')) {
-    return <AdminPage />;
+    return (
+      <>
+        <AdminPage />
+        <Analytics />
+      </>
+    );
   }
 
   if (window.location.pathname.startsWith('/apply')) {
-    return <ApplyPage />;
+    return (
+      <>
+        <ApplyPage />
+        <Analytics />
+      </>
+    );
   }
 
-  return <PublicSite />;
+  return (
+    <>
+      <PublicSite />
+      <Analytics />
+    </>
+  );
 }
