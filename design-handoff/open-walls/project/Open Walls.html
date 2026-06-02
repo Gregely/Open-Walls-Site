@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Open Walls — Cork</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Knewave&family=Titan+One&family=Bagel+Fat+One&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Shantell+Sans:ital,wght@0,500;0,600;0,700;0,800;1,600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+<script>
+  /* progressive enhancement: only arm reveal-hiding when JS is alive,
+     and fail open if the main script never initialises */
+  document.documentElement.classList.add('anim');
+  window.addEventListener('load', function () {
+    setTimeout(function () {
+      if (!window.__owInit) document.documentElement.classList.remove('anim');
+    }, 2500);
+  });
+</script>
+</head>
+<body data-motion="on" data-motif="medium">
+
+  <!-- ===================== NAV ===================== -->
+  <header class="nav">
+    <a class="nav__brand" href="#top" style="text-decoration:none">
+      <span class="mark" id="nav-mark"></span>
+      <span>Open Walls</span>
+    </a>
+    <nav class="nav__links" aria-label="Sections">
+      <a href="#upcoming" data-link="upcoming">Upcoming</a>
+      <a href="#past" data-link="past">Past Shows</a>
+      <a href="#about" data-link="about">About</a>
+    </nav>
+    <a class="nav__cta" href="mailto:openwallscork@gmail.com?subject=Open%20Walls%20%E2%80%94%20artist%20application">Get a spot</a>
+  </header>
+
+  <main id="top">
+
+    <!-- ===================== HERO / UPCOMING ===================== -->
+    <section class="hero" id="upcoming">
+      <div class="hero__motifs" id="hero-motifs"></div>
+      <div class="badge-free"><span>Free<br>Entry</span></div>
+      <div class="wrap hero__inner">
+        <div class="hero__top">
+          <span class="tag reveal">Vol. 12</span>
+          <span class="eyebrow reveal" data-d="1">Monthly exhibition + maker's market · Cork</span>
+        </div>
+        <h1 class="hero__date display reveal" data-d="1">
+          <span class="ln c-red">Sat 28</span>
+          <span class="ln c-purple">June</span>
+        </h1>
+        <div class="hero__time display reveal" data-d="2">12—6pm</div>
+        <div class="hero__venue reveal" data-d="2">The Guesthouse · MacCurtain St, Cork</div>
+        <p class="hero__desc reveal" data-d="3">
+          One room, one day, wall to wall. Twenty-odd Cork artists hang original work, prints
+          and zines beside a maker's market — with coffee, records and the odd pint. Roll in, look
+          around, take something home.
+        </p>
+        <div class="hero__cta reveal" data-d="3">
+          <a class="btn btn--primary" href="mailto:openwallscork@gmail.com?subject=Open%20Walls%20Vol.%2012%20%E2%80%94%20artist%20application">
+            Get your spot <span class="arrow">→</span>
+          </a>
+          <a class="btn btn--ghost" href="#about">Find out more</a>
+        </div>
+        <div class="lineup reveal" data-d="4">
+          <div class="lineup__label">Showing this month</div>
+          <div class="lineup__names hand">
+            <span>Thady Trá</span><span>Evan Stout</span><span>Andrew Carroll</span><span>Victoria Cialkosz</span><span>Isabel Quinn</span><span>Sachiko Kobayashi</span><span>+ many more</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- divider -->
+    <div class="divider" id="divider-1" aria-hidden="true"></div>
+
+    <!-- ===================== PAST SHOWS ===================== -->
+    <section class="section section--tint" id="past">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2 class="display reveal">Past Shows</h2>
+          <p class="blurb reveal" data-d="1">Eleven rooms filled so far. Different walls every month, same idea — get the work out where people are.</p>
+        </div>
+        <div class="grid" id="past-grid"></div>
+      </div>
+    </section>
+
+    <!-- ===================== ABOUT ===================== -->
+    <section class="section" id="about">
+      <div class="wrap about__grid">
+        <div>
+          <h2 class="about__lead display reveal">A wall is just a gallery that hasn't been asked yet.</h2>
+          <div class="about__body reveal" data-d="1">
+            <p>Open Walls is a Cork-based visual art collective. Once a month we borrow a room somewhere in the city and fill it, wall to wall, with work from local artists — paintings, prints, photography, zines — next to a maker's market and a bit of music.</p>
+            <p>No white-cube hush, no entry fee, no gatekeeping. If you make things in Cork, there's a wall here with your name on it.</p>
+          </div>
+          <div class="contact reveal" data-d="2" style="margin-top:30px">
+            <a href="mailto:openwallscork@gmail.com"><span class="ico">@</span>openwallscork@gmail.com</a>
+            <a href="https://instagram.com/openwallscork" target="_blank" rel="noopener"><span class="ico">◳</span>@openwallscork</a>
+          </div>
+        </div>
+        <div class="about__stack reveal" data-d="2" id="about-stack" aria-hidden="true"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer">
+    <div class="footer__motifs" id="footer-motifs"></div>
+    <div class="wrap">
+      <div class="footer__mark display">Open Walls</div>
+      <div class="footer__row">
+        <a href="#upcoming">Upcoming</a>
+        <a href="#past">Past Shows</a>
+        <a href="#about">About</a>
+        <a href="mailto:openwallscork@gmail.com">openwallscork@gmail.com</a>
+        <a href="https://instagram.com/openwallscork" target="_blank" rel="noopener">@openwallscork</a>
+      </div>
+      <div class="footer__fine">Cork, Ireland · Monthly · Free entry · Bring a friend.</div>
+    </div>
+  </footer>
+
+  <!-- tweaks mount -->
+  <div id="tweaks-root"></div>
+
+  <!-- scripts -->
+  <script src="motif.js"></script>
+  <script src="site.js"></script>
+
+  <!-- React + Babel for the Tweaks panel island -->
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <script type="text/babel" src="tweaks-panel.jsx"></script>
+  <script type="text/babel" src="site-tweaks.jsx"></script>
+
+</body>
+</html>
