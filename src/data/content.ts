@@ -49,6 +49,7 @@ export const fallbackContent: SiteContent = {
       visible: true,
       accent: '#d94f2b',
       seed: 12,
+      posterImageUrl: '',
     },
     {
       id: 'vol-10',
@@ -62,6 +63,7 @@ export const fallbackContent: SiteContent = {
       visible: true,
       accent: '#2aa8a0',
       seed: 7,
+      posterImageUrl: '',
     },
     {
       id: 'vol-9',
@@ -75,6 +77,7 @@ export const fallbackContent: SiteContent = {
       visible: true,
       accent: '#f4821f',
       seed: 23,
+      posterImageUrl: '',
     },
     {
       id: 'vol-8',
@@ -88,6 +91,7 @@ export const fallbackContent: SiteContent = {
       visible: true,
       accent: '#5b4fa0',
       seed: 41,
+      posterImageUrl: '',
     },
     {
       id: 'vol-7',
@@ -101,6 +105,7 @@ export const fallbackContent: SiteContent = {
       visible: true,
       accent: '#2b9fd4',
       seed: 5,
+      posterImageUrl: '',
     },
     {
       id: 'vol-6',
@@ -114,6 +119,7 @@ export const fallbackContent: SiteContent = {
       visible: true,
       accent: '#3fad5c',
       seed: 33,
+      posterImageUrl: '',
     },
     {
       id: 'vol-5',
@@ -127,6 +133,7 @@ export const fallbackContent: SiteContent = {
       visible: true,
       accent: '#8c4f8b',
       seed: 18,
+      posterImageUrl: '',
     },
     {
       id: 'vol-4',
@@ -140,6 +147,7 @@ export const fallbackContent: SiteContent = {
       visible: true,
       accent: '#f5c800',
       seed: 9,
+      posterImageUrl: '',
     },
   ],
 };

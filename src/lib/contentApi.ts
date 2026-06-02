@@ -43,6 +43,7 @@ type PastShowRow = {
   visible: boolean | null;
   accent: string | null;
   seed: number | null;
+  poster_image_url: string | null;
 };
 
 function strings(value: unknown): string[] {
@@ -94,6 +95,7 @@ function mapPastShow(row: PastShowRow): PastShow {
     visible: row.visible ?? true,
     accent: row.accent || '#d94f2b',
     seed: row.seed ?? 1,
+    posterImageUrl: row.poster_image_url || '',
   };
 }
 
@@ -142,6 +144,7 @@ function pastShowPayload(show: PastShow) {
     visible: show.visible,
     accent: show.accent,
     seed: show.seed,
+    poster_image_url: show.posterImageUrl,
   };
 }
 

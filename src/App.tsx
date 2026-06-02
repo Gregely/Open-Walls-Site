@@ -4,6 +4,7 @@ import { MotifStack } from './components/MotifStack';
 import { AdminPage } from './admin/AdminPage';
 import { instagramHandle, mailto } from './data/content';
 import { loadContent } from './lib/contentApi';
+import { resolveImageUrl } from './lib/imageUrl';
 import type { SiteContent } from './types/content';
 
 function PlacedMotif({
@@ -239,6 +240,7 @@ function PastShows({ content }: { content: SiteContent }) {
           {pastShows.map((show, index) => {
             const place = [show.venue, show.location].filter(Boolean).join(' · ');
             const subject = `Open Walls ${show.volume} - ${show.date} at ${place}`;
+            const posterSrc = show.posterImageUrl ? resolveImageUrl(show.posterImageUrl) : '';
             return (
               <a
                 key={show.id}
@@ -249,9 +251,20 @@ function PastShows({ content }: { content: SiteContent }) {
                 style={{ '--card-accent': show.accent } as CSSProperties}
               >
                 <span className="card__vol">{show.volume}</span>
-                <span className="card__thumb" aria-hidden="true">
-                  <MotifStack size={118} seed={show.seed} layers={5} jitter={8} />
-                </span>
+                {posterSrc ? (
+                  <span className="card__thumb">
+                    <img
+                      src={posterSrc}
+                      alt={`${show.volume} poster — ${show.date}${place ? ` at ${place}` : ''}`}
+                      className="card__poster"
+                      loading="lazy"
+                    />
+                  </span>
+                ) : (
+                  <span className="card__thumb" aria-hidden="true">
+                    <MotifStack size={118} seed={show.seed} layers={5} jitter={8} />
+                  </span>
+                )}
                 <span className="card__date">{show.date}</span>
                 <span className="card__loc">{place}</span>
               </a>

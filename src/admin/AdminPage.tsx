@@ -6,6 +6,8 @@ import { deletePastShow, loadContent, saveContent } from '../lib/contentApi';
 import { hasSupabaseConfig, supabase } from '../lib/supabase';
 import type { PastShow, SiteContent } from '../types/content';
 import { MotifStack } from '../components/MotifStack';
+import { ConfirmDialog } from '../components/ConfirmDialog';
+import { resolveImageUrl, isValidPosterUrl } from '../lib/imageUrl';
 
 type SaveState = 'idle' | 'saving' | 'saved';
 
@@ -21,6 +23,7 @@ const blankPastShow = (displayOrder: number): PastShow => ({
   visible: true,
   accent: '#d94f2b',
   seed: Math.floor(Math.random() * 900) + 100,
+  posterImageUrl: '',
 });
 
 function isEmail(value: string) {
@@ -47,6 +50,9 @@ function validateContent(content: SiteContent) {
     if (!show.volume.trim()) errors.push(`${label}: volume is required.`);
     if (!show.date.trim()) errors.push(`${label}: date is required.`);
     if (!show.venue.trim()) errors.push(`${label}: venue is required.`);
+    if (!isValidPosterUrl(show.posterImageUrl)) {
+      errors.push(`${label}: poster image URL must be a valid https:// URL or left empty.`);
+    }
   });
 
   return errors;
@@ -58,12 +64,14 @@ function Field({
   onChange,
   type = 'text',
   required = false,
+  hint,
 }: {
   label: string;
   value: string | number;
   onChange: (value: string) => void;
   type?: string;
   required?: boolean;
+  hint?: string;
 }) {
   return (
     <label className="admin-field">
@@ -72,6 +80,7 @@ function Field({
         {required && <b aria-hidden="true"> *</b>}
       </span>
       <input type={type} value={value} onChange={(event) => onChange(event.target.value)} required={required} />
+      {hint && <span className="admin-field__hint">{hint}</span>}
     </label>
   );
 }
@@ -185,6 +194,7 @@ export function AdminPage() {
   const [error, setError] = useState('');
 
   const visibleCount = useMemo(() => content.pastShows.filter((show) => show.visible).length, [content.pastShows]);
+  const [confirmDelete, setConfirmDelete] = useState<PastShow | null>(null);
 
   const refreshContent = async () => {
     setLoading(true);
@@ -257,8 +267,16 @@ export function AdminPage() {
     }
   };
 
-  const removePastShow = async (show: PastShow) => {
-    if (!window.confirm(`Delete ${show.volume || 'this past show'}? This cannot be undone.`)) return;
+  // Step 1: clicking the Delete button opens the confirmation modal.
+  const requestDeletePastShow = (show: PastShow) => {
+    setConfirmDelete(show);
+  };
+
+  // Step 2: user confirms inside the modal — perform the actual delete.
+  const handleConfirmDelete = async () => {
+    if (!confirmDelete) return;
+    const show = confirmDelete;
+    setConfirmDelete(null);
     setError('');
     try {
       if (supabase) await deletePastShow(show.id);
@@ -470,7 +488,7 @@ export function AdminPage() {
                     />
                     Visible
                   </label>
-                  <button type="button" className="admin-mini-btn admin-mini-btn--danger" onClick={() => removePastShow(show)}>
+                  <button type="button" className="admin-mini-btn admin-mini-btn--danger" onClick={() => requestDeletePastShow(show)}>
                     Delete
                   </button>
                 </div>
@@ -554,6 +572,17 @@ export function AdminPage() {
                     }))
                   }
                 />
+                <Field
+                  label="Poster image URL"
+                  value={show.posterImageUrl}
+                  hint={'Paste a public Google Drive sharing link or direct image URL. File must be shared as “Anyone with the link can view”. Recommended size: 1080 × 1350 px (4:5 portrait).'}
+                  onChange={(posterImageUrl) =>
+                    updateContent((current) => ({
+                      ...current,
+                      pastShows: current.pastShows.map((item) => (item.id === show.id ? { ...item, posterImageUrl } : item)),
+                    }))
+                  }
+                />
               </div>
               <ArtistsEditor
                 artists={show.artists}
@@ -565,6 +594,23 @@ export function AdminPage() {
                   }))
                 }
               />
+              {show.posterImageUrl && (
+                <div className="admin-poster-preview-wrap">
+                  <span className="admin-muted">Poster preview</span>
+                  <img
+                    key={show.posterImageUrl}
+                    src={resolveImageUrl(show.posterImageUrl)}
+                    alt={`Poster for ${show.volume || 'this show'}`}
+                    className="admin-poster-preview"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                    onLoad={(e) => {
+                      e.currentTarget.style.display = '';
+                    }}
+                  />
+                </div>
+              )}
             </article>
           ))}
         </div>
@@ -590,6 +636,20 @@ export function AdminPage() {
           />
         </div>
       </section>
+
+      <ConfirmDialog
+        isOpen={confirmDelete !== null}
+        title="Delete past show?"
+        message={
+          confirmDelete
+            ? `This will permanently remove ${[confirmDelete.volume, confirmDelete.date, confirmDelete.venue].filter(Boolean).join(' · ')} from the site. This cannot be undone.`
+            : ''
+        }
+        confirmLabel="Delete show"
+        cancelLabel="Cancel"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setConfirmDelete(null)}
+      />
     </main>
   );
 }

@@ -1091,6 +1091,112 @@ button:disabled {
   opacity: 0.6;
 }
 
+/* ── Danger button variant ─────────────────────────────────────────────── */
+
+.btn--danger {
+  background: var(--red);
+  color: var(--paper);
+  border-color: var(--red);
+  /* Yellow shadow gives a warning feel, distinct from the primary red+ink. */
+  box-shadow: 7px 7px 0 var(--yellow);
+}
+
+.btn--danger:hover {
+  box-shadow: 11px 11px 0 var(--yellow);
+}
+
+/* ── Confirmation dialog ───────────────────────────────────────────────── */
+
+.confirm-dialog {
+  width: min(480px, calc(100% - 48px));
+  margin: auto;
+  padding: 0;
+  border: 3px solid var(--ink);
+  background: var(--paper);
+  box-shadow: 10px 10px 0 var(--ink);
+}
+
+.confirm-dialog::backdrop {
+  background: rgba(36, 16, 25, 0.6);
+  backdrop-filter: blur(3px);
+}
+
+.confirm-dialog__body {
+  padding: clamp(20px, 5vw, 36px);
+  display: grid;
+  gap: 14px;
+}
+
+.confirm-dialog__title {
+  margin: 0;
+  font-size: clamp(1.4rem, 5vw, 2.1rem);
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.confirm-dialog__message {
+  margin: 0;
+  font-family: var(--font-hand);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--ink-soft);
+}
+
+.confirm-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.confirm-dialog__actions .btn {
+  min-height: 48px;
+  padding: 10px 20px 12px;
+  font-size: 1rem;
+}
+
+/* ── Past-show card poster image ──────────────────────────────────────── */
+
+/* card__thumb already has aspect-ratio: 1080/1350, overflow: hidden, border.
+   card__poster fills that container and crops to cover it. */
+.card__poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Admin poster preview ─────────────────────────────────────────────── */
+
+/* Higher specificity (2 classes + element) beats .admin-field span (1 class + element) */
+.admin-field span.admin-field__hint {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  text-transform: none;
+  letter-spacing: 0;
+  line-height: 1.4;
+}
+
+.admin-poster-preview-wrap {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+  font-family: var(--font-hand);
+  font-weight: 900;
+  font-size: 0.88rem;
+  text-transform: uppercase;
+}
+
+.admin-poster-preview {
+  max-height: 240px;
+  width: auto;
+  border: 3px solid var(--ink);
+  box-shadow: 4px 4px 0 var(--grey);
+  object-fit: contain;
+  display: block;
+}
+
 @media (max-width: 760px) {
   .admin-top,
   .admin-section-title {

@@ -36,6 +36,8 @@ export type PastShow = {
   visible: boolean;
   accent: string;
   seed: number;
+  /** Public Google Drive share link or direct image URL. Empty string = no image. */
+  posterImageUrl: string;
 };
 
 export type SiteContent = {

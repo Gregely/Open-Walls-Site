@@ -42,6 +42,9 @@ create table if not exists public.past_shows (
   visible boolean not null default true,
   accent text not null default '#d94f2b',
   seed integer not null default 1,
+  -- Public Google Drive share link or direct image URL for the show poster.
+  -- Must be publicly viewable ("Anyone with the link") to display on the site.
+  poster_image_url text not null default '',
   updated_at timestamptz not null default now()
 );
 
@@ -193,15 +196,15 @@ insert into public.upcoming_show (
   cta_email_subject = excluded.cta_email_subject,
   cta_email_body = excluded.cta_email_body;
 
-insert into public.past_shows (id, volume, date, venue, location, artists, notes, display_order, visible, accent, seed) values
-  ('vol-11', 'Vol. 11', 'May 2026', 'Nash 19', 'Princes St', '[]'::jsonb, '', 10, true, '#d94f2b', 12),
-  ('vol-10', 'Vol. 10', 'Apr 2026', 'The Guesthouse', 'MacCurtain', '[]'::jsonb, '', 20, true, '#2aa8a0', 7),
-  ('vol-9', 'Vol. 9', 'Mar 2026', 'Plugd Records', 'Triskel', '[]'::jsonb, '', 30, true, '#f4821f', 23),
-  ('vol-8', 'Vol. 8', 'Feb 2026', 'The Kino', 'Washington St', '[]'::jsonb, '', 40, true, '#5b4fa0', 41),
-  ('vol-7', 'Vol. 7', 'Jan 2026', 'Sample Studios', 'Churchfield', '[]'::jsonb, '', 50, true, '#2b9fd4', 5),
-  ('vol-6', 'Vol. 6', 'Dec 2025', 'The Roundy', 'Castle St', '[]'::jsonb, '', 60, true, '#3fad5c', 33),
-  ('vol-5', 'Vol. 5', 'Nov 2025', 'Cork Coffee Roasters', '', '[]'::jsonb, '', 70, true, '#8c4f8b', 18),
-  ('vol-4', 'Vol. 4', 'Oct 2025', 'Crane Lane', 'Phoenix St', '[]'::jsonb, '', 80, true, '#f5c800', 9)
+insert into public.past_shows (id, volume, date, venue, location, artists, notes, display_order, visible, accent, seed, poster_image_url) values
+  ('vol-11', 'Vol. 11', 'May 2026', 'Nash 19', 'Princes St', '[]'::jsonb, '', 10, true, '#d94f2b', 12, ''),
+  ('vol-10', 'Vol. 10', 'Apr 2026', 'The Guesthouse', 'MacCurtain', '[]'::jsonb, '', 20, true, '#2aa8a0', 7, ''),
+  ('vol-9', 'Vol. 9', 'Mar 2026', 'Plugd Records', 'Triskel', '[]'::jsonb, '', 30, true, '#f4821f', 23, ''),
+  ('vol-8', 'Vol. 8', 'Feb 2026', 'The Kino', 'Washington St', '[]'::jsonb, '', 40, true, '#5b4fa0', 41, ''),
+  ('vol-7', 'Vol. 7', 'Jan 2026', 'Sample Studios', 'Churchfield', '[]'::jsonb, '', 50, true, '#2b9fd4', 5, ''),
+  ('vol-6', 'Vol. 6', 'Dec 2025', 'The Roundy', 'Castle St', '[]'::jsonb, '', 60, true, '#3fad5c', 33, ''),
+  ('vol-5', 'Vol. 5', 'Nov 2025', 'Cork Coffee Roasters', '', '[]'::jsonb, '', 70, true, '#8c4f8b', 18, ''),
+  ('vol-4', 'Vol. 4', 'Oct 2025', 'Crane Lane', 'Phoenix St', '[]'::jsonb, '', 80, true, '#f5c800', 9, '')
 on conflict (id) do update set
   volume = excluded.volume,
   date = excluded.date,
@@ -212,4 +215,5 @@ on conflict (id) do update set
   display_order = excluded.display_order,
   visible = excluded.visible,
   accent = excluded.accent,
-  seed = excluded.seed;
+  seed = excluded.seed,
+  poster_image_url = excluded.poster_image_url;
