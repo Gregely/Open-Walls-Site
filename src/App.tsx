@@ -359,7 +359,7 @@ function PublicSite() {
 
   useEffect(() => {
     if (content?.settings.siteName) {
-      document.title = `${content.settings.siteName} Cork`;
+      document.title = `${content.settings.siteName}`;
     }
   }, [content]);
 

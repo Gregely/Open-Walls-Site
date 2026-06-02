@@ -1,7 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Open Walls">
-  <rect width="64" height="64" fill="#fcfaf4"/>
-  <rect x="9" y="9" width="46" height="46" fill="#f5c800" transform="rotate(-7 32 32)"/>
-  <rect x="16" y="16" width="32" height="32" fill="#d94f2b" transform="rotate(8 32 32)"/>
-  <rect x="23" y="23" width="18" height="18" fill="#2aa8a0" transform="rotate(-10 32 32)"/>
-  <rect x="29" y="29" width="6" height="6" fill="#241019"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #8a6db0;
+      }
+
+      .cls-2 {
+        fill: #f6b720;
+      }
+
+      .cls-3 {
+        fill: #00b1a3;
+      }
+
+      .cls-4 {
+        fill: #a9a1a4;
+      }
+
+      .cls-5 {
+        fill: #ffe82b;
+      }
+    </style>
+  </defs>
+  <path class="cls-2" d="M70.07,683.6c2.6-199.73,5.21-399.45,7.81-599.18,200.29,9.4,400.59,18.81,600.88,28.21l51.16,602.94-659.86-31.98Z"/>
+  <polygon class="cls-3" points="134.11 609.86 635.48 644.9 606.33 202.1 130.28 150.36 134.11 609.86"/>
+  <polygon class="cls-5" points="231.23 538.21 540.11 580.11 539.63 265.49 188.53 288.57 231.23 538.21"/>
+  <polygon class="cls-4" points="305.13 487.13 469.08 487.35 464.22 333.06 292.62 339.75 305.13 487.13"/>
+  <polygon class="cls-1" points="359.86 443.6 423.52 441.11 418.43 381.16 354.78 383.64 359.86 443.6"/>
 </svg>
