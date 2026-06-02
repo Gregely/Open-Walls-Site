@@ -1,5 +1,10 @@
+/*
+  OpenWallsGrid — the custom display font from the design handoff.
+  File lives in public/fonts/ so it is served directly at /fonts/TypeFaceGrid.ttf
+  in both dev (npm run dev) and production (Vercel / npm run build).
+*/
 @font-face {
-  font-family: "TypeFaceGrid";
+  font-family: "OpenWallsGrid";
   src: url("/fonts/TypeFaceGrid.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
@@ -23,9 +28,24 @@
   --green: #3fad5c;
   --grey: #9b9490;
   --accent: var(--red);
-  --font-display: "TypeFaceGrid", Impact, Haettenschweiler, "Arial Black", system-ui, sans-serif;
-  --font-body: "Nunito", "Segoe UI", system-ui, sans-serif;
-  --font-hand: "Segoe Print", "Bradley Hand ITC", "Comic Sans MS", cursive;
+
+  /*
+    --font-display  Custom poster/logo/heading font. Falls back to Impact-style
+                    display fonts if the file fails to load.
+
+    --font-body     Body text. Uses reliable cross-platform system fonts.
+                    "Nunito" was previously listed here but was never loaded —
+                    removed to prevent silent fallback divergence across devices.
+
+    --font-hand     Casual handwritten style used for labels, nav links, admin UI.
+                    "Bradley Hand" (Mac), "Segoe Print" (Windows), "Chalkboard SE"
+                    (iOS/Mac). Final fallback is Arial so all platforms get the same
+                    safe font rather than the unpredictable `cursive` generic.
+  */
+  --font-display: "OpenWallsGrid", Impact, Haettenschweiler, "Arial Black", sans-serif;
+  --font-body: "Segoe UI", Arial, Helvetica, sans-serif;
+  --font-hand: "Segoe Print", "Bradley Hand", "Chalkboard SE", "Comic Sans MS", Arial, sans-serif;
+
   --maxw: 1180px;
   --pad: clamp(20px, 5vw, 64px);
   --reveal-dur: 0.7s;
