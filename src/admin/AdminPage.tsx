@@ -878,7 +878,7 @@ export function AdminPage() {
           <section className="admin-card">
             <div className="admin-section-title">
               <h2>Upcoming Show</h2>
-              <span>Main event details and artist lineup</span>
+              <span>Main event details</span>
             </div>
             <div className="admin-grid">
               <Field
@@ -992,13 +992,6 @@ export function AdminPage() {
                 </span>
               </div>
             </div>
-            <ArtistsEditor
-              artists={content.upcomingShow.artists}
-              onChange={(v) =>
-                updateContent((c) => ({ ...c, upcomingShow: { ...c.upcomingShow, artists: v } }))
-              }
-              label="Upcoming artists"
-            />
           </section>
 
           <SaveBar

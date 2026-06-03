@@ -216,14 +216,7 @@ function Hero({ content }: { content: SiteContent }) {
             Find out more
           </a>
         </div>
-        <div className="lineup reveal" data-d="4">
-          <div className="lineup__label">Showing this month</div>
-          <div className="lineup__names hand" aria-label={`Showing this month: ${upcomingShow.artists.join(', ')}`}>
-            {upcomingShow.artists.map((artist) => (
-              <span key={artist}>{artist}</span>
-            ))}
-          </div>
-        </div>
+
       </div>
     </section>
   );
@@ -258,9 +251,7 @@ function PastShows({ content }: { content: SiteContent }) {
           <h2 id="past-title" className="display reveal">
             Past Shows
           </h2>
-          <p className="blurb reveal" data-d="1">
-            Different walls every month, same idea - get the work out where people are.
-          </p>
+
         </div>
 
         {/* Toggle control — sits above the grid so it is always reachable,
