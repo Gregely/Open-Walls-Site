@@ -49,6 +49,13 @@ create table if not exists public.past_shows (
   -- Public Google Drive share link or direct image URL for the show poster.
   -- Must be publicly viewable ("Anyone with the link") to display on the site.
   poster_image_url text not null default '',
+  -- Archive media — added after initial launch.
+  -- Run the migration below before deploying the archive feature:
+  --   ALTER TABLE public.past_shows
+  --     ADD COLUMN IF NOT EXISTS artist_promos jsonb NOT NULL DEFAULT '[]'::jsonb,
+  --     ADD COLUMN IF NOT EXISTS event_photos  jsonb NOT NULL DEFAULT '[]'::jsonb;
+  artist_promos jsonb not null default '[]'::jsonb,
+  event_photos  jsonb not null default '[]'::jsonb,
   updated_at timestamptz not null default now()
 );
 

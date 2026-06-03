@@ -4,7 +4,7 @@ import type { Session } from '@supabase/supabase-js';
 import { fallbackContent, instagramHandle } from '../data/content';
 import { deletePastShow, loadContent, saveContent } from '../lib/contentApi';
 import { hasSupabaseConfig, supabase } from '../lib/supabase';
-import type { PastShow, SiteContent } from '../types/content';
+import type { ArtistPromo, ArtistPromoImage, EventPhoto, PastShow, SiteContent } from '../types/content';
 import { MotifStack } from '../components/MotifStack';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { resolveImageUrl, isValidPosterUrl } from '../lib/imageUrl';
@@ -37,6 +37,8 @@ const blankPastShow = (displayOrder: number): PastShow => ({
   accent: '#d94f2b',
   seed: Math.floor(Math.random() * 900) + 100,
   posterImageUrl: '',
+  artistPromos: [],
+  eventPhotos: [],
 });
 
 function isEmail(value: string) {
@@ -162,6 +164,236 @@ function ArtistsEditor({
   );
 }
 
+// ── Archive media editors ─────────────────────────────────────────────────
+
+function PromoEntryEditor({
+  promo,
+  isOpen,
+  onToggle,
+  onUpdate,
+  onRemove,
+}: {
+  promo: ArtistPromo;
+  isOpen: boolean;
+  onToggle: () => void;
+  onUpdate: (updated: ArtistPromo) => void;
+  onRemove: () => void;
+}) {
+  const patch = (updates: Partial<ArtistPromo>) => onUpdate({ ...promo, ...updates });
+
+  const addImage = () =>
+    patch({
+      images: [...promo.images, { id: crypto.randomUUID(), url: '', caption: '', alt: '' }],
+    });
+
+  const updateImage = (id: string, updates: Partial<ArtistPromoImage>) =>
+    patch({ images: promo.images.map((img) => (img.id === id ? { ...img, ...updates } : img)) });
+
+  const removeImage = (id: string) =>
+    patch({ images: promo.images.filter((img) => img.id !== id) });
+
+  return (
+    <article className={`archive-entry${isOpen ? ' archive-entry--open' : ''}`}>
+      <button type="button" className="archive-entry__toggle" onClick={onToggle} aria-expanded={isOpen}>
+        <span>{promo.artistName || 'New artist promo'}</span>
+        <span className="archive-entry__chevron" aria-hidden="true">{isOpen ? '▲' : '▼'}</span>
+      </button>
+      {isOpen && (
+        <div className="archive-entry__content">
+          <div className="admin-grid">
+            <Field label="Artist name" value={promo.artistName} onChange={(v) => patch({ artistName: v })} />
+            <Field label="Instagram / social URL" value={promo.socialUrl} onChange={(v) => patch({ socialUrl: v })} />
+            <Field
+              label="Display order"
+              type="number"
+              value={promo.displayOrder}
+              onChange={(v) => patch({ displayOrder: Number(v) || 0 })}
+            />
+            <TextArea label="Description / caption" value={promo.description} rows={3} onChange={(v) => patch({ description: v })} />
+          </div>
+          <label className="admin-check" style={{ margin: '10px 0 14px' }}>
+            <input type="checkbox" checked={promo.visible} onChange={(e) => patch({ visible: e.target.checked })} />
+            Visible
+          </label>
+          <div className="archive-images-editor">
+            <div className="archive-editor__head">
+              <span className="archive-editor__label" style={{ fontSize: '0.85rem' }}>Images</span>
+              <button type="button" className="admin-mini-btn" onClick={addImage}>+ Add image</button>
+            </div>
+            {promo.images.length === 0 && <p className="admin-muted">No images yet.</p>}
+            {promo.images.map((img) => (
+              <div key={img.id} className="archive-image-row">
+                <div className="archive-image-row__fields">
+                  <Field
+                    label="Image URL"
+                    value={img.url}
+                    hint='Direct image URL or public Google Drive share link ("Anyone with the link can view")'
+                    onChange={(v) => updateImage(img.id, { url: v })}
+                  />
+                  <Field label="Caption" value={img.caption} onChange={(v) => updateImage(img.id, { caption: v })} />
+                  <Field label="Alt text" value={img.alt} onChange={(v) => updateImage(img.id, { alt: v })} />
+                </div>
+                {img.url && (
+                  <div className="archive-img-preview">
+                    <img
+                      src={resolveImageUrl(img.url)}
+                      alt={img.alt || 'Preview'}
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      onLoad={(e) => { e.currentTarget.style.display = ''; }}
+                    />
+                  </div>
+                )}
+                <button
+                  type="button"
+                  className="admin-mini-btn admin-mini-btn--ghost"
+                  style={{ marginTop: 4 }}
+                  onClick={() => removeImage(img.id)}
+                >
+                  Remove image
+                </button>
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: 16 }}>
+            <button type="button" className="admin-mini-btn admin-mini-btn--danger" onClick={onRemove}>
+              Delete artist promo
+            </button>
+          </div>
+        </div>
+      )}
+    </article>
+  );
+}
+
+function ArtistPromoEditor({
+  promos,
+  onChange,
+}: {
+  promos: ArtistPromo[];
+  onChange: (promos: ArtistPromo[]) => void;
+}) {
+  const [openIds, setOpenIds] = useState<Set<string>>(() => new Set());
+
+  const addPromo = () => {
+    const newPromo: ArtistPromo = {
+      id: crypto.randomUUID(),
+      artistName: '',
+      socialUrl: '',
+      description: '',
+      images: [],
+      visible: true,
+      displayOrder: (promos.length + 1) * 10,
+    };
+    onChange([...promos, newPromo]);
+    setOpenIds((prev) => new Set([...prev, newPromo.id]));
+  };
+
+  const toggle = (id: string) =>
+    setOpenIds((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+
+  return (
+    <div className="archive-editor">
+      <div className="archive-editor__head">
+        <span className="archive-editor__label">Artist Promos</span>
+        <button type="button" className="admin-mini-btn" onClick={addPromo}>+ Add promo</button>
+      </div>
+      {promos.length === 0 && <p className="admin-muted">No artist promos yet.</p>}
+      {promos.map((promo) => (
+        <PromoEntryEditor
+          key={promo.id}
+          promo={promo}
+          isOpen={openIds.has(promo.id)}
+          onToggle={() => toggle(promo.id)}
+          onUpdate={(updated) => onChange(promos.map((p) => (p.id === updated.id ? updated : p)))}
+          onRemove={() => onChange(promos.filter((p) => p.id !== promo.id))}
+        />
+      ))}
+    </div>
+  );
+}
+
+function EventPhotoEditor({
+  photos,
+  onChange,
+}: {
+  photos: EventPhoto[];
+  onChange: (photos: EventPhoto[]) => void;
+}) {
+  const addPhoto = () => {
+    const newPhoto: EventPhoto = {
+      id: crypto.randomUUID(),
+      url: '',
+      caption: '',
+      credit: '',
+      alt: '',
+      visible: true,
+      displayOrder: (photos.length + 1) * 10,
+    };
+    onChange([...photos, newPhoto]);
+  };
+
+  const update = (updated: EventPhoto) =>
+    onChange(photos.map((p) => (p.id === updated.id ? updated : p)));
+
+  return (
+    <div className="archive-editor" style={{ marginTop: 20 }}>
+      <div className="archive-editor__head">
+        <span className="archive-editor__label">Event Photos</span>
+        <button type="button" className="admin-mini-btn" onClick={addPhoto}>+ Add photo</button>
+      </div>
+      {photos.length === 0 && <p className="admin-muted">No event photos yet.</p>}
+      {photos.map((photo) => (
+        <div key={photo.id} className="event-photo-row">
+          <div className="admin-grid">
+            <Field
+              label="Image URL"
+              value={photo.url}
+              hint='Direct image URL or public Google Drive share link ("Anyone with the link can view")'
+              onChange={(v) => update({ ...photo, url: v })}
+            />
+            <Field label="Caption" value={photo.caption} onChange={(v) => update({ ...photo, caption: v })} />
+            <Field label="Photographer credit" value={photo.credit} onChange={(v) => update({ ...photo, credit: v })} />
+            <Field label="Alt text" value={photo.alt} onChange={(v) => update({ ...photo, alt: v })} />
+            <Field
+              label="Display order"
+              type="number"
+              value={photo.displayOrder}
+              onChange={(v) => update({ ...photo, displayOrder: Number(v) || 0 })}
+            />
+          </div>
+          <div className="event-photo-row__foot">
+            <label className="admin-check">
+              <input type="checkbox" checked={photo.visible} onChange={(e) => update({ ...photo, visible: e.target.checked })} />
+              Visible
+            </label>
+            {photo.url && (
+              <div className="archive-img-preview">
+                <img
+                  src={resolveImageUrl(photo.url)}
+                  alt={photo.alt || 'Preview'}
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                  onLoad={(e) => { e.currentTarget.style.display = ''; }}
+                />
+              </div>
+            )}
+            <button
+              type="button"
+              className="admin-mini-btn admin-mini-btn--danger"
+              onClick={() => onChange(photos.filter((p) => p.id !== photo.id))}
+            >
+              Remove photo
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ── SaveBar ───────────────────────────────────────────────────────────────
 // Bottom save affordance for long content tabs.
 
@@ -215,6 +447,7 @@ function CollapsiblePastShowEditor({
   onDeleteRequest: (show: PastShow) => void;
 }) {
   const patch = (updates: Partial<PastShow>) => onUpdate({ ...show, ...updates });
+  const [showArchive, setShowArchive] = useState(false);
 
   return (
     <article className={`past-editor past-editor--collapsible${isOpen ? ' past-editor--open' : ''}`}>
@@ -320,6 +553,30 @@ function CollapsiblePastShowEditor({
                 />
               </div>
             )}
+
+            <div className="archive-media-section">
+              <button
+                type="button"
+                className="archive-media-toggle"
+                onClick={() => setShowArchive((prev) => !prev)}
+                aria-expanded={showArchive}
+              >
+                <span>Archive Media</span>
+                <span aria-hidden="true">{showArchive ? '▲' : '▼'}</span>
+              </button>
+              {showArchive && (
+                <>
+                  <ArtistPromoEditor
+                    promos={show.artistPromos}
+                    onChange={(v) => patch({ artistPromos: v })}
+                  />
+                  <EventPhotoEditor
+                    photos={show.eventPhotos}
+                    onChange={(v) => patch({ eventPhotos: v })}
+                  />
+                </>
+              )}
+            </div>
 
             <div className="past-editor__delete-row">
               <button

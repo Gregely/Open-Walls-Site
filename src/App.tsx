@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { MotifStack } from './components/MotifStack';
 import { AdminPage } from './admin/AdminPage';
 import { ApplyPage } from './apply/ApplyPage';
+import { PastShowArchivePage } from './past/PastShowArchivePage';
 import { instagramHandle, mailto } from './data/content';
 import { loadContent } from './lib/contentApi';
 import { resolveImageUrl } from './lib/imageUrl';
@@ -278,7 +279,6 @@ function PastShows({ content }: { content: SiteContent }) {
         <div className="grid" id="past-shows-grid">
           {displayedShows.map((show, index) => {
             const place = [show.venue, show.location].filter(Boolean).join(' · ');
-            const subject = `Open Walls ${show.volume} - ${show.date} at ${place}`;
             const posterSrc = show.posterImageUrl ? resolveImageUrl(show.posterImageUrl) : '';
             // Cards beyond the initial preview are revealed immediately when
             // expanded — the scroll-based reveal effect (useProgressiveMotion)
@@ -290,8 +290,8 @@ function PastShows({ content }: { content: SiteContent }) {
                 key={show.id}
                 className={`card reveal${isExtra ? ' in' : ''}`}
                 data-d={String((index % 3) + 1)}
-                href={mailto(settings.contactEmail, subject)}
-                aria-label={`Ask about ${show.volume}, ${show.date}, ${place}`}
+                href={`/past/${show.id}`}
+                aria-label={`View ${show.volume} archive${place ? `, ${place}` : ''}`}
                 style={{ '--card-accent': show.accent } as CSSProperties}
               >
                 <span className="card__vol">{show.volume}</span>
@@ -447,6 +447,15 @@ export function App() {
     return (
       <>
         <ApplyPage />
+        <Analytics />
+      </>
+    );
+  }
+
+  if (window.location.pathname.startsWith('/past/')) {
+    return (
+      <>
+        <PastShowArchivePage />
         <Analytics />
       </>
     );

@@ -26,6 +26,33 @@ export type UpcomingShow = {
   applicationsOpen: boolean;
 };
 
+export type ArtistPromoImage = {
+  id: string;
+  url: string;
+  caption: string;
+  alt: string;
+};
+
+export type ArtistPromo = {
+  id: string;
+  artistName: string;
+  socialUrl: string;
+  description: string;
+  images: ArtistPromoImage[];
+  visible: boolean;
+  displayOrder: number;
+};
+
+export type EventPhoto = {
+  id: string;
+  url: string;
+  caption: string;
+  credit: string;
+  alt: string;
+  visible: boolean;
+  displayOrder: number;
+};
+
 export type PastShow = {
   id: string;
   volume: string;
@@ -40,6 +67,8 @@ export type PastShow = {
   seed: number;
   /** Public Google Drive share link or direct image URL. Empty string = no image. */
   posterImageUrl: string;
+  artistPromos: ArtistPromo[];
+  eventPhotos: EventPhoto[];
 };
 
 export type SiteContent = {

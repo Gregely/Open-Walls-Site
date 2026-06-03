@@ -1,5 +1,14 @@
 import { fallbackContent } from '../data/content';
-import type { ContentLoadResult, PastShow, SiteContent, SiteSettings, UpcomingShow } from '../types/content';
+import type {
+  ArtistPromo,
+  ArtistPromoImage,
+  ContentLoadResult,
+  EventPhoto,
+  PastShow,
+  SiteContent,
+  SiteSettings,
+  UpcomingShow,
+} from '../types/content';
 import { hasSupabaseConfig, supabase } from './supabase';
 
 const SITE_ID = 'default';
@@ -45,10 +54,60 @@ type PastShowRow = {
   accent: string | null;
   seed: number | null;
   poster_image_url: string | null;
+  artist_promos: unknown;
+  event_photos: unknown;
 };
 
 function strings(value: unknown): string[] {
   return Array.isArray(value) ? value.map(String).filter(Boolean) : [];
+}
+
+function parsePromoImages(value: unknown): ArtistPromoImage[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item: unknown) => {
+    if (!item || typeof item !== 'object') return [];
+    const obj = item as Record<string, unknown>;
+    return [{
+      id: String(obj.id || crypto.randomUUID()),
+      url: String(obj.url || ''),
+      caption: String(obj.caption || ''),
+      alt: String(obj.alt || ''),
+    }];
+  });
+}
+
+function parseArtistPromos(value: unknown): ArtistPromo[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item: unknown) => {
+    if (!item || typeof item !== 'object') return [];
+    const obj = item as Record<string, unknown>;
+    return [{
+      id: String(obj.id || crypto.randomUUID()),
+      artistName: String(obj.artistName || ''),
+      socialUrl: String(obj.socialUrl || ''),
+      description: String(obj.description || ''),
+      images: parsePromoImages(obj.images),
+      visible: obj.visible !== false,
+      displayOrder: Number(obj.displayOrder || 0),
+    }];
+  });
+}
+
+function parseEventPhotos(value: unknown): EventPhoto[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item: unknown) => {
+    if (!item || typeof item !== 'object') return [];
+    const obj = item as Record<string, unknown>;
+    return [{
+      id: String(obj.id || crypto.randomUUID()),
+      url: String(obj.url || ''),
+      caption: String(obj.caption || ''),
+      credit: String(obj.credit || ''),
+      alt: String(obj.alt || ''),
+      visible: obj.visible !== false,
+      displayOrder: Number(obj.displayOrder || 0),
+    }];
+  });
 }
 
 function mapSiteSettings(row: SiteSettingsRow | null): SiteSettings {
@@ -101,6 +160,8 @@ function mapPastShow(row: PastShowRow): PastShow {
     accent: row.accent || '#d94f2b',
     seed: row.seed ?? 1,
     posterImageUrl: row.poster_image_url || '',
+    artistPromos: parseArtistPromos(row.artist_promos),
+    eventPhotos: parseEventPhotos(row.event_photos),
   };
 }
 
@@ -151,6 +212,8 @@ function pastShowPayload(show: PastShow) {
     accent: show.accent,
     seed: show.seed,
     poster_image_url: show.posterImageUrl,
+    artist_promos: show.artistPromos,
+    event_photos: show.eventPhotos,
   };
 }
 
