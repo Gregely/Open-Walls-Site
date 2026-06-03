@@ -588,22 +588,37 @@ export function AdminPage() {
       setAuthReady(true);
       return;
     }
+
+    // Load content for users who are already logged in when the page opens
+    // (e.g. refreshing /admin while a session is still active).
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setAuthReady(true);
+      if (data.session) {
+        refreshContent();
+      }
     });
-    const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      setSession(nextSession);
-    });
-    return () => {
-      data.subscription.unsubscribe();
-    };
-  }, []);
 
-  useEffect(() => {
-    if (session) refreshContent();
+    const { data: authData } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      setSession(nextSession);
+
+      // Only reload content on a genuine new sign-in.
+      //
+      // Supabase fires TOKEN_REFRESHED automatically (roughly every hour and
+      // whenever a backgrounded tab regains focus). Treating that event the
+      // same as SIGNED_IN caused refreshContent() to run in the background and
+      // silently overwrite unsaved admin edits — the primary bug reported.
+      if (event === 'SIGNED_IN') {
+        refreshContent();
+      }
+      // SIGNED_OUT, TOKEN_REFRESHED, USER_UPDATED, etc. — do NOT reload content.
+    });
+
+    return () => authData.subscription.unsubscribe();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session]);
+  }, []);
+  // ↑ Deliberately no [session] effect. That pattern triggered refreshContent()
+  //   on every TOKEN_REFRESHED event and wiped out unsaved edits.
 
   // ── Content updates ───────────────────────────────────────────────────
 

@@ -168,11 +168,16 @@ export async function loadContent(includeHidden = false): Promise<ContentLoadRes
       .map(mapPastShow)
       .filter((show) => includeHidden || show.visible);
 
+    // Return exactly what Supabase has — including an empty array.
+    // Do NOT fall back to fallbackContent.pastShows when the list is empty:
+    // the user may have intentionally deleted all past shows, and substituting
+    // the 8 demo shows here was the cause of "deleted shows randomly reappear".
+    // Fallback shows are only used when Supabase is unreachable (the catch block).
     return {
       content: {
         settings: mapSiteSettings(settingsResult.data as SiteSettingsRow | null),
         upcomingShow: mapUpcomingShow(upcomingResult.data as UpcomingShowRow | null),
-        pastShows: pastShows.length ? pastShows : fallbackContent.pastShows,
+        pastShows,
       },
       source: 'supabase',
     };
