@@ -2571,3 +2571,205 @@ button:disabled {
   margin-top: 10px;
   flex-wrap: wrap;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   UPDATES SYSTEM
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Homepage updates section ───────────────────────────────────────────── */
+
+.updates-section {
+  background: var(--paper);
+  border-bottom: 3px solid var(--ink);
+}
+
+.updates-section__head {
+  margin-bottom: clamp(20px, 3vh, 36px);
+}
+
+.updates-section__head h2 {
+  margin: 0;
+  font-size: clamp(2rem, 6vw, 4rem);
+}
+
+.updates-section__foot {
+  margin-top: clamp(20px, 3vh, 32px);
+}
+
+.updates-more {
+  font-family: var(--font-hand);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 2px;
+  transition: border-color 0.15s;
+}
+
+.updates-more:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+/* ── Update cards (homepage + /updates list) ────────────────────────────── */
+
+.updates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: clamp(14px, 2vw, 24px);
+}
+
+.update-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--paper-2);
+  border: 3px solid var(--ink);
+  box-shadow: 4px 4px 0 var(--ink);
+  text-decoration: none;
+  color: var(--ink);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.update-card:hover,
+.update-card:focus-visible {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0 var(--ink);
+}
+
+.update-card__img {
+  border-bottom: 3px solid var(--ink);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+.update-card__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.update-card__body {
+  padding: 12px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.update-card__label {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--red);
+  line-height: 1;
+}
+
+.update-card__title {
+  font-family: var(--font-hand);
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.3;
+}
+
+.update-card__sub {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  line-height: 1.4;
+}
+
+/* ── /updates list page ─────────────────────────────────────────────────── */
+
+.updates-page {
+  min-height: 100vh;
+  padding-block: clamp(36px, 6vh, 72px);
+}
+
+.updates-empty {
+  color: var(--ink-soft);
+  font-family: var(--font-hand);
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin: 0;
+  padding: clamp(28px, 5vh, 48px) 0;
+}
+
+/* ── /updates/:slug detail page ─────────────────────────────────────────── */
+
+.update-detail {
+  min-height: 100vh;
+  padding-block: clamp(36px, 6vh, 72px);
+}
+
+.update-detail__inner {
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2.5vh, 22px);
+}
+
+.update-detail__title {
+  margin: 0;
+  font-size: clamp(2.2rem, 7vw, 4.5rem);
+  line-height: 1.05;
+}
+
+.update-detail__sub {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--ink-soft);
+  font-family: var(--font-hand);
+  font-weight: 600;
+}
+
+.update-detail__date {
+  margin: 0;
+  font-family: var(--font-hand);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.update-detail__img {
+  border: 3px solid var(--ink);
+  box-shadow: 5px 5px 0 var(--ink);
+  overflow: hidden;
+}
+
+.update-detail__img img {
+  width: 100%;
+  display: block;
+  max-height: 60vh;
+  object-fit: cover;
+}
+
+.update-detail__body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.update-detail__body p {
+  margin: 0;
+  line-height: 1.65;
+}
+
+.update-detail__cta {
+  padding-top: 8px;
+}
+
+/* ── Admin: update editor extras ────────────────────────────────────────── */
+
+.update-editor-wrap {
+  margin-bottom: 4px;
+}
+
+.update-editor-save-row {
+  display: flex;
+  justify-content: flex-end;
+  padding: 6px 0 10px;
+  border-bottom: 1px solid var(--grey);
+  margin-bottom: 8px;
+}

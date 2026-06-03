@@ -288,3 +288,55 @@ on conflict (id) do update set
   accent = excluded.accent,
   seed = excluded.seed,
   poster_image_url = excluded.poster_image_url;
+
+-- ── Updates table ─────────────────────────────────────────────────────────
+-- Run this migration in the Supabase SQL editor:
+--
+--   (copy from CREATE TABLE through the final semicolon below)
+--
+-- This table is separate from past_shows / site_settings so the updates
+-- admin section can save each update independently without touching the
+-- main site content save flow.
+
+create table if not exists public.updates (
+  id            uuid primary key default gen_random_uuid(),
+  title         text not null default '',
+  slug          text not null unique,
+  subtitle      text not null default '',
+  label         text not null default '',
+  update_date   text not null default '',
+  image_url     text not null default '',
+  body          text not null default '',
+  cta_label     text not null default '',
+  cta_url       text not null default '',
+  published     boolean not null default false,
+  pinned        boolean not null default false,
+  display_order integer not null default 0,
+  created_at    timestamptz not null default now(),
+  updated_at    timestamptz not null default now()
+);
+
+create or replace trigger updates_updated_at
+before update on public.updates
+for each row execute function public.set_updated_at();
+
+alter table public.updates enable row level security;
+
+-- Public can read only published updates.
+drop policy if exists "Public can read published updates" on public.updates;
+create policy "Public can read published updates"
+on public.updates
+for select
+to anon, authenticated
+using (published = true or auth.role() = 'authenticated');
+
+-- Authenticated admin can manage all updates.
+drop policy if exists "Authenticated users can manage updates" on public.updates;
+create policy "Authenticated users can manage updates"
+on public.updates
+for all
+to authenticated
+using (true)
+with check (true);
+
+-- ── End updates table ──────────────────────────────────────────────────────

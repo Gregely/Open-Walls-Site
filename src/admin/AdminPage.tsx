@@ -9,13 +9,14 @@ import { MotifStack } from '../components/MotifStack';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { resolveImageUrl, isValidPosterUrl } from '../lib/imageUrl';
 import { ApplicationsSection } from './ApplicationsSection';
+import { UpdatesSection } from './UpdatesSection';
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
 type SaveState = 'idle' | 'saving' | 'saved';
-type AdminTab = 'applications' | 'site-content' | 'upcoming' | 'past-shows';
+type AdminTab = 'applications' | 'site-content' | 'upcoming' | 'past-shows' | 'updates';
 
-const VALID_TABS: AdminTab[] = ['applications', 'site-content', 'upcoming', 'past-shows'];
+const VALID_TABS: AdminTab[] = ['applications', 'site-content', 'upcoming', 'past-shows', 'updates'];
 
 function getTabFromHash(): AdminTab {
   const hash = window.location.hash.slice(1) as AdminTab;
@@ -731,6 +732,7 @@ function AdminTabBar({
       id: 'past-shows',
       label: showCount > 0 ? `Past Shows (${showCount})` : 'Past Shows',
     },
+    { id: 'updates', label: 'Updates' },
   ];
 
   return (
@@ -1008,7 +1010,9 @@ export function AdminPage() {
 
   // ── Render ────────────────────────────────────────────────────────────
 
-  const isContentTab = activeTab !== 'applications';
+  // Updates has its own per-item save; Applications has no save. Only show
+  // the top-header Reload/Save buttons for the three content-editing tabs.
+  const isContentTab = activeTab === 'site-content' || activeTab === 'upcoming' || activeTab === 'past-shows';
 
   // Button label for the top-header save button
   const saveLabel =
@@ -1324,6 +1328,9 @@ export function AdminPage() {
           lastSaved={lastSaved}
         />
       )}
+
+      {/* ── Updates tab ─────────────────────────────────────────────── */}
+      {activeTab === 'updates' && <UpdatesSection />}
 
       {/* ── Confirm delete past show ─────────────────────────────────── */}
       <ConfirmDialog

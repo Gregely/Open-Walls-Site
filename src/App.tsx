@@ -5,10 +5,14 @@ import { MotifStack } from './components/MotifStack';
 import { AdminPage } from './admin/AdminPage';
 import { ApplyPage } from './apply/ApplyPage';
 import { PastShowArchivePage } from './past/PastShowArchivePage';
+import { UpdatesPage } from './updates/UpdatesPage';
+import { UpdateDetailPage } from './updates/UpdateDetailPage';
 import { instagramHandle, mailto } from './data/content';
 import { loadContent } from './lib/contentApi';
+import { loadPublishedUpdates } from './lib/updatesApi';
 import { resolveImageUrl } from './lib/imageUrl';
 import type { SiteContent } from './types/content';
+import type { Update } from './types/update';
 
 function PlacedMotif({
   x,
@@ -50,7 +54,7 @@ function useProgressiveMotion(content: SiteContent) {
   useEffect(() => {
     const root = document.documentElement;
     const revealEls = Array.from(document.querySelectorAll<HTMLElement>('.reveal'));
-    const sections = ['upcoming', 'past', 'about']
+    const sections = ['upcoming', 'updates', 'past', 'about']
       .map((id) => document.getElementById(id))
       .filter(Boolean) as HTMLElement[];
     const navLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('.nav__links a[data-link]'));
@@ -134,6 +138,9 @@ function Nav({ content }: { content: SiteContent }) {
       <nav className="nav__links" aria-label="Sections">
         <a href="#upcoming" data-link="upcoming">
           Upcoming
+        </a>
+        <a href="#updates" data-link="updates">
+          Updates
         </a>
         <a href="#past" data-link="past">
           Past Shows
@@ -232,6 +239,53 @@ function MotifDivider() {
         <MotifStack key={seed} size={46 + (index % 3) * 14} seed={seed} layers={4} jitter={9} />
       ))}
     </div>
+  );
+}
+
+const UPDATES_PREVIEW = 3;
+
+function UpdatesSection({ updates }: { updates: Update[] }) {
+  if (updates.length === 0) return null;
+
+  return (
+    <section className="section updates-section" id="updates" aria-labelledby="updates-title">
+      <div className="wrap">
+        <div className="updates-section__head">
+          <h2 id="updates-title" className="display reveal">
+            Updates
+          </h2>
+        </div>
+        <div className="updates-grid">
+          {updates.slice(0, UPDATES_PREVIEW).map((u) => {
+            const imgSrc = u.imageUrl ? resolveImageUrl(u.imageUrl) : '';
+            return (
+              <a
+                key={u.id}
+                className="update-card reveal"
+                href={`/updates/${u.slug}`}
+                aria-label={u.title}
+              >
+                {imgSrc && (
+                  <div className="update-card__img">
+                    <img src={imgSrc} alt={u.title} loading="lazy" />
+                  </div>
+                )}
+                <div className="update-card__body">
+                  {u.label && <span className="update-card__label">{u.label}</span>}
+                  <span className="update-card__title">{u.title}</span>
+                  {u.subtitle && <span className="update-card__sub">{u.subtitle}</span>}
+                </div>
+              </a>
+            );
+          })}
+        </div>
+        <div className="updates-section__foot">
+          <a className="updates-more" href="/updates">
+            View all updates →
+          </a>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -384,11 +438,24 @@ function Footer({ content }: { content: SiteContent }) {
 
 function PublicSite() {
   const [loadResult, setLoadResult] = useState<Awaited<ReturnType<typeof loadContent>> | null>(null);
+  const [updates, setUpdates] = useState<Update[]>([]);
 
   useEffect(() => {
     let alive = true;
-    loadContent(false).then((result) => {
-      if (alive) setLoadResult(result);
+    // Load site content and published updates together so the page only renders
+    // once both are available. This eliminates the race where content arrives
+    // first (updates = []), UpdatesSection returns null, and the reveal/scroll
+    // hooks fire before the updates section ever mounts.
+    Promise.all([
+      loadContent(false),
+      loadPublishedUpdates().catch((err) => {
+        console.error('Failed to load updates:', err);
+        return [] as Update[];
+      }),
+    ]).then(([contentResult, updatesList]) => {
+      if (!alive) return;
+      setLoadResult(contentResult);
+      setUpdates(updatesList);
     });
     return () => {
       alive = false;
@@ -412,10 +479,24 @@ function PublicSite() {
     );
   }
 
-  return <RenderedSite content={content} fallbackWarning={import.meta.env.DEV && loadResult.source === 'fallback' ? loadResult.error : undefined} />;
+  return (
+    <RenderedSite
+      content={content}
+      updates={updates}
+      fallbackWarning={import.meta.env.DEV && loadResult.source === 'fallback' ? loadResult.error : undefined}
+    />
+  );
 }
 
-function RenderedSite({ content, fallbackWarning }: { content: SiteContent; fallbackWarning?: string }) {
+function RenderedSite({
+  content,
+  updates,
+  fallbackWarning,
+}: {
+  content: SiteContent;
+  updates: Update[];
+  fallbackWarning?: string;
+}) {
   useProgressiveMotion(content);
 
   return (
@@ -425,6 +506,7 @@ function RenderedSite({ content, fallbackWarning }: { content: SiteContent; fall
       <main id="top">
         <Hero content={content} />
         <MotifDivider />
+        <UpdatesSection updates={updates} />
         <PastShows content={content} />
         <About content={content} />
       </main>
@@ -456,6 +538,24 @@ export function App() {
     return (
       <>
         <PastShowArchivePage />
+        <Analytics />
+      </>
+    );
+  }
+
+  if (window.location.pathname === '/updates') {
+    return (
+      <>
+        <UpdatesPage />
+        <Analytics />
+      </>
+    );
+  }
+
+  if (window.location.pathname.startsWith('/updates/')) {
+    return (
+      <>
+        <UpdateDetailPage />
         <Analytics />
       </>
     );
