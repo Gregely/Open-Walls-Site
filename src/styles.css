@@ -30,21 +30,17 @@
   --accent: var(--red);
 
   /*
-    --font-display  Custom poster/logo/heading font. Falls back to Impact-style
-                    display fonts if the file fails to load.
+    --font-display  Custom poster/logo/heading font (OpenWallsGrid). Falls back to
+                    Impact-style display fonts if the file fails to load.
 
-    --font-body     Body text. Uses reliable cross-platform system fonts.
-                    "Nunito" was previously listed here but was never loaded —
-                    removed to prevent silent fallback divergence across devices.
+    --font-body     Body text. Space Grotesk loaded via Google Fonts.
 
-    --font-hand     Casual handwritten style used for labels, nav links, admin UI.
-                    "Bradley Hand" (Mac), "Segoe Print" (Windows), "Chalkboard SE"
-                    (iOS/Mac). Final fallback is Arial so all platforms get the same
-                    safe font rather than the unpredictable `cursive` generic.
+    --font-hand     Accent/label/UI text — also Space Grotesk. Kept as a separate
+                    variable so weight/size overrides stay decoupled from body copy.
   */
   --font-display: "OpenWallsGrid", Impact, Haettenschweiler, "Arial Black", sans-serif;
-  --font-body: "Segoe UI", Arial, Helvetica, sans-serif;
-  --font-hand: "Segoe Print", "Bradley Hand", "Chalkboard SE", "Comic Sans MS", Arial, sans-serif;
+  --font-body: "Space Grotesk", "Inter", "Segoe UI", Arial, sans-serif;
+  --font-hand: "Space Grotesk", "Inter", "Segoe UI", Arial, sans-serif;
 
   --maxw: 1180px;
   --pad: clamp(20px, 5vw, 64px);
