@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import {
   deleteApplication,
@@ -209,7 +209,7 @@ function ApplicationCard({ app, onStatusChange, onNotesSaved, onDeleteRequest }:
 
 // ── ApplicationsSection ───────────────────────────────────────────────────
 
-export function ApplicationsSection() {
+export function ApplicationsSection({ onNewCount }: { onNewCount?: (count: number) => void }) {
   const [apps, setApps] = useState<Application[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -271,6 +271,11 @@ export function ApplicationsSection() {
   };
 
   const newCount = apps.filter((a) => a.status === 'new').length;
+
+  // Report new-application count to parent (used for the tab label)
+  useEffect(() => {
+    onNewCount?.(newCount);
+  }, [newCount, onNewCount]);
 
   return (
     <>

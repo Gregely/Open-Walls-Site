@@ -849,8 +849,9 @@ html.anim .reveal.in {
 }
 
 .admin-shell {
+  --shell-pad: clamp(18px, 4vw, 48px);
   min-height: 100svh;
-  padding: clamp(18px, 4vw, 48px);
+  padding: var(--shell-pad);
   background: var(--paper);
   color: var(--ink);
 }
@@ -1231,6 +1232,231 @@ button:disabled {
   .admin-grid,
   .artist-row {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ── Admin tab bar ────────────────────────────────────────────────────── */
+
+/*
+  The tab-bar wrapper uses negative inline margins to escape the admin-shell
+  padding and span the full viewport width, then adds padding back inside so
+  the tab text aligns with the card content.
+*/
+.admin-tab-bar-wrap {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  margin-inline: calc(-1 * var(--shell-pad));
+  background: var(--paper);
+  border-bottom: 3px solid var(--ink);
+  margin-bottom: clamp(20px, 3vw, 32px);
+}
+
+.admin-tab-bar {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-inline: var(--shell-pad);
+}
+
+.admin-tab {
+  padding: 13px 18px 10px;
+  border: none;
+  border-bottom: 3px solid transparent;
+  background: none;
+  font-family: var(--font-hand);
+  font-size: 0.95rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  /* Overlap the wrap's border-bottom with the active indicator */
+  margin-bottom: -3px;
+  transition: color 0.15s;
+}
+
+.admin-tab:hover {
+  color: var(--ink);
+}
+
+.admin-tab--active {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+.admin-top__note {
+  margin: 0;
+  color: var(--ink-soft);
+  font-family: var(--font-hand);
+  font-weight: 800;
+}
+
+/* Error bar inside tabbed layout (no outer margin from .admin-card) */
+.admin-error--tabbed {
+  max-width: 1180px;
+  margin: 0 auto 20px;
+}
+
+/* ── Admin save bar (bottom of content tabs) ──────────────────────────── */
+
+.admin-save-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  max-width: 1180px;
+  margin: 20px auto 0;
+  padding: 16px 20px;
+  border: 3px solid var(--ink);
+  background: var(--paper-2);
+  box-shadow: 5px 5px 0 var(--ink);
+}
+
+.admin-save-bar__note {
+  font-family: var(--font-hand);
+  font-weight: 800;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+
+.admin-save-bar__btn {
+  min-height: 44px;
+  padding: 9px 22px 11px;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* ── Collapsible past-show editor ─────────────────────────────────────── */
+
+.past-editor--collapsible {
+  border: 3px solid var(--ink);
+  background: var(--paper);
+  /* override old box-shadow from base .past-editor rule */
+  box-shadow: 4px 4px 0 var(--grey);
+  overflow: hidden;
+}
+
+.past-editor__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 13px 18px;
+  background: var(--paper-2);
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-hand);
+  transition: background 0.15s, color 0.15s;
+}
+
+.past-editor__toggle:hover {
+  background: color-mix(in srgb, var(--ink) 10%, var(--paper-2));
+}
+
+.past-editor--open > .past-editor__toggle {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.past-editor--open > .past-editor__toggle:hover {
+  background: var(--ink-soft);
+}
+
+.past-editor__summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+}
+
+.past-editor__summary-vol {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  text-transform: uppercase;
+}
+
+.past-editor__summary-meta {
+  font-family: var(--font-hand);
+  font-weight: 800;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.past-editor__badge {
+  font-family: var(--font-hand);
+  font-weight: 900;
+  font-size: 0.75rem;
+  padding: 2px 7px;
+  background: var(--grey);
+  color: var(--paper);
+}
+
+.past-editor--open > .past-editor__toggle .past-editor__badge {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.past-editor__chevron {
+  font-size: 0.72rem;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.past-editor__content {
+  padding: 18px;
+}
+
+.past-editor__footer {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.past-editor__delete-row {
+  padding-top: 12px;
+  border-top: 2px dashed var(--grey);
+}
+
+/* ── Past-editor actions bar ──────────────────────────────────────────── */
+
+.past-editor-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-bottom: 18px;
+}
+
+.past-editor-bulk-actions {
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 560px) {
+  .admin-tab {
+    padding-inline: 12px;
+    font-size: 0.85rem;
+  }
+
+  .admin-save-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-save-bar__btn {
+    width: 100%;
+  }
+
+  .past-editor-actions {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 
