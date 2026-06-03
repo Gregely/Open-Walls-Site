@@ -17,6 +17,7 @@ function UpdateCard({ update }: { update: Update }) {
         {update.label && <span className="update-card__label">{update.label}</span>}
         <span className="update-card__title">{update.title}</span>
         {update.subtitle && <span className="update-card__sub">{update.subtitle}</span>}
+        {update.date && <span className="update-card__date">{update.date}</span>}
       </div>
     </a>
   );

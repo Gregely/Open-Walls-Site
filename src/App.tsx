@@ -274,6 +274,7 @@ function UpdatesSection({ updates }: { updates: Update[] }) {
                   {u.label && <span className="update-card__label">{u.label}</span>}
                   <span className="update-card__title">{u.title}</span>
                   {u.subtitle && <span className="update-card__sub">{u.subtitle}</span>}
+                  {u.date && <span className="update-card__date">{u.date}</span>}
                 </div>
               </a>
             );

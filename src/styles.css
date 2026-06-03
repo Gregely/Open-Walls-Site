@@ -2680,6 +2680,15 @@ button:disabled {
   line-height: 1.4;
 }
 
+.update-card__date {
+  font-family: var(--font-hand);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--grey);
+  line-height: 1;
+  margin-top: 3px;
+}
+
 /* ── /updates list page ─────────────────────────────────────────────────── */
 
 .updates-page {
@@ -2735,14 +2744,12 @@ button:disabled {
 .update-detail__img {
   border: 3px solid var(--ink);
   box-shadow: 5px 5px 0 var(--ink);
-  overflow: hidden;
 }
 
 .update-detail__img img {
   width: 100%;
+  height: auto;
   display: block;
-  max-height: 60vh;
-  object-fit: cover;
 }
 
 .update-detail__body {
