@@ -154,6 +154,11 @@ function Nav({ content }: { content: SiteContent }) {
         <a href={settings.instagramUrl} target="_blank" rel="noreferrer">
           Instagram
         </a>
+        {settings.donateUrl && (
+          <a href={settings.donateUrl} target="_blank" rel="noreferrer">
+            Donate
+          </a>
+        )}
       </div>
     </header>
   );
@@ -437,6 +442,11 @@ function Footer({ content }: { content: SiteContent }) {
           <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer">
             {instagramHandle(settings.instagramUrl)}
           </a>
+          {settings.donateUrl && (
+            <a href={settings.donateUrl} target="_blank" rel="noopener noreferrer">
+              Donate
+            </a>
+          )}
         </nav>
         <div className="footer__fine">{settings.footerText}</div>
       </div>

@@ -11,6 +11,11 @@ create table if not exists public.site_settings (
   about_body text not null default '',
   contact_email text not null,
   instagram_url text not null default '',
+  -- Donation link. Empty string hides the Donate button on the public site.
+  -- Migration (run in Supabase SQL editor if this column does not exist yet):
+  --   ALTER TABLE public.site_settings
+  --     ADD COLUMN IF NOT EXISTS donate_url text NOT NULL DEFAULT 'https://ko-fi.com/openwalls';
+  donate_url text not null default 'https://ko-fi.com/openwalls',
   footer_text text not null default '',
   updated_at timestamptz not null default now()
 );

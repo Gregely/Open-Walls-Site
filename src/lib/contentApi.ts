@@ -23,6 +23,7 @@ type SiteSettingsRow = {
   about_body: string | null;
   contact_email: string | null;
   instagram_url: string | null;
+  donate_url: string | null;
   footer_text: string | null;
 };
 
@@ -123,6 +124,9 @@ function mapSiteSettings(row: SiteSettingsRow | null): SiteSettings {
     aboutBody: row?.about_body || fallbackContent.settings.aboutBody,
     contactEmail: row?.contact_email || fallbackContent.settings.contactEmail,
     instagramUrl: row?.instagram_url || fallbackContent.settings.instagramUrl,
+    // Use ?? (not ||) so an empty string from the DB hides the button,
+    // while null (pre-migration row) falls back to the default donate URL.
+    donateUrl: row?.donate_url ?? fallbackContent.settings.donateUrl,
     footerText: row?.footer_text || fallbackContent.settings.footerText,
   };
 }
@@ -181,6 +185,7 @@ function siteSettingsPayload(settings: SiteSettings) {
     about_body: settings.aboutBody,
     contact_email: settings.contactEmail,
     instagram_url: settings.instagramUrl,
+    donate_url: settings.donateUrl,
     footer_text: settings.footerText,
   };
 }

@@ -1164,6 +1164,14 @@ export function AdminPage() {
                   updateContent((c) => ({ ...c, settings: { ...c.settings, instagramUrl: v } }))
                 }
               />
+              <Field
+                label="Donate URL"
+                value={content.settings.donateUrl}
+                hint="Defaults to https://ko-fi.com/openwalls. Leave blank to hide the Donate button."
+                onChange={(v) =>
+                  updateContent((c) => ({ ...c, settings: { ...c.settings, donateUrl: v } }))
+                }
+              />
             </div>
           </section>
 

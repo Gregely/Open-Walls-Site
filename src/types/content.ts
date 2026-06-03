@@ -7,6 +7,8 @@ export type SiteSettings = {
   aboutBody: string;
   contactEmail: string;
   instagramUrl: string;
+  /** Donation link URL. Empty string hides the Donate button. */
+  donateUrl: string;
   footerText: string;
 };
 

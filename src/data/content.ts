@@ -12,6 +12,7 @@ export const fallbackContent: SiteContent = {
       "Open Walls is a Cork-based visual art collective. Once a month we borrow a room somewhere in the city and fill it, wall to wall, with work from local artists - paintings, prints, photography, zines - next to a maker's market and a bit of music.\n\nNo white-cube hush, no entry fee, no gatekeeping. If you make things in Cork, there's a wall here with your name on it.",
     contactEmail: 'openwallscork@gmail.com',
     instagramUrl: 'https://instagram.com/openwallscork',
+    donateUrl: 'https://ko-fi.com/openwalls',
     footerText: 'Cork, Ireland · Monthly · Free entry · Bring a friend.',
   },
   upcomingShow: {
