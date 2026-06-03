@@ -539,6 +539,54 @@ button:focus-visible {
   font-weight: 800;
 }
 
+/* ── Past Shows expand / collapse controls ──────────────────────────────── */
+
+.past-shows__controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  /* sits between sec-head and the grid */
+  margin-top: calc(-1 * clamp(10px, 2vh, 20px));
+  margin-bottom: clamp(20px, 3vh, 32px);
+}
+
+.past-shows__count {
+  font-family: var(--font-hand);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--ink-soft);
+}
+
+.past-shows__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px 11px;
+  border: 3px solid var(--ink);
+  background: var(--paper-2);
+  color: var(--ink);
+  font-family: var(--font-hand);
+  font-size: 0.98rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 var(--ink);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  /* Generous tap target for mobile */
+  min-height: 44px;
+}
+
+.past-shows__toggle:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--ink);
+}
+
+.past-shows__toggle:active {
+  transform: none;
+  box-shadow: 2px 2px 0 var(--ink);
+}
+
 .about__grid {
   display: grid;
   grid-template-columns: 1.4fr 1fr;

@@ -241,8 +241,15 @@ function MotifDivider() {
   );
 }
 
+const PAST_SHOWS_PREVIEW = 3;
+
 function PastShows({ content }: { content: SiteContent }) {
   const { settings, pastShows } = content;
+  const [showAll, setShowAll] = useState(false);
+
+  const hasMore = pastShows.length > PAST_SHOWS_PREVIEW;
+  const hiddenCount = pastShows.length - PAST_SHOWS_PREVIEW;
+  const displayedShows = showAll ? pastShows : pastShows.slice(0, PAST_SHOWS_PREVIEW);
 
   return (
     <section className="section section--tint" id="past" aria-labelledby="past-title">
@@ -255,15 +262,42 @@ function PastShows({ content }: { content: SiteContent }) {
             Different walls every month, same idea - get the work out where people are.
           </p>
         </div>
-        <div className="grid">
-          {pastShows.map((show, index) => {
+
+        {/* Toggle control — sits above the grid so it is always reachable,
+            even after expanding a long list on mobile. */}
+        {hasMore && (
+          <div className="past-shows__controls">
+            <span className="past-shows__count">
+              {showAll
+                ? `All ${pastShows.length} past shows`
+                : `Showing 3 of ${pastShows.length}`}
+            </span>
+            <button
+              type="button"
+              className="past-shows__toggle"
+              aria-expanded={showAll}
+              aria-controls="past-shows-grid"
+              onClick={() => setShowAll((prev) => !prev)}
+            >
+              {showAll ? 'Show fewer' : `Show ${hiddenCount} more`}
+            </button>
+          </div>
+        )}
+
+        <div className="grid" id="past-shows-grid">
+          {displayedShows.map((show, index) => {
             const place = [show.venue, show.location].filter(Boolean).join(' · ');
             const subject = `Open Walls ${show.volume} - ${show.date} at ${place}`;
             const posterSrc = show.posterImageUrl ? resolveImageUrl(show.posterImageUrl) : '';
+            // Cards beyond the initial preview are revealed immediately when
+            // expanded — the scroll-based reveal effect (useProgressiveMotion)
+            // only re-runs when `content` changes, not on local state toggles,
+            // so newly-shown cards need the `in` class baked in from the start.
+            const isExtra = showAll && index >= PAST_SHOWS_PREVIEW;
             return (
               <a
                 key={show.id}
-                className="card reveal"
+                className={`card reveal${isExtra ? ' in' : ''}`}
                 data-d={String((index % 3) + 1)}
                 href={mailto(settings.contactEmail, subject)}
                 aria-label={`Ask about ${show.volume}, ${show.date}, ${place}`}
