@@ -995,6 +995,12 @@ html.anim .reveal.in {
   padding: 4px;
 }
 
+/* Checkbox + subordinate hint text */
+.admin-check-with-hint {
+  display: grid;
+  gap: 5px;
+}
+
 .admin-check {
   display: inline-flex;
   align-items: center;

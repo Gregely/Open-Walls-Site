@@ -22,6 +22,8 @@ export type UpcomingShow = {
   ctaLabel: string;
   ctaEmailSubject: string;
   ctaEmailBody: string;
+  /** When false the Apply button is greyed out and non-clickable on the public site. */
+  applicationsOpen: boolean;
 };
 
 export type PastShow = {

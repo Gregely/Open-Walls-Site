@@ -195,9 +195,23 @@ function Hero({ content }: { content: SiteContent }) {
           {settings.heroBody || upcomingShow.description}
         </p>
         <div className="hero__cta reveal" data-d="3">
-          <a className="btn btn--primary" href="/apply">
-            {upcomingShow.ctaLabel} <span className="arrow">-&gt;</span>
-          </a>
+          {upcomingShow.applicationsOpen ? (
+            <a className="btn btn--primary" href="/apply">
+              {upcomingShow.ctaLabel}
+            </a>
+          ) : (
+            // Applications closed: render a real <button disabled> so the
+            // browser handles non-clickability natively. Do not use <a disabled>
+            // (invalid HTML) or keep the href (would still be followable).
+            <button
+              type="button"
+              className="btn btn--primary"
+              disabled
+              aria-disabled="true"
+            >
+              {upcomingShow.ctaLabel}
+            </button>
+          )}
           <a className="btn btn--ghost" href="#about">
             Find out more
           </a>

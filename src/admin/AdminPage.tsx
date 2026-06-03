@@ -973,6 +973,24 @@ export function AdminPage() {
                 />
                 Free entry badge
               </label>
+              <div className="admin-check-with-hint">
+                <label className="admin-check">
+                  <input
+                    type="checkbox"
+                    checked={content.upcomingShow.applicationsOpen}
+                    onChange={(e) =>
+                      updateContent((c) => ({
+                        ...c,
+                        upcomingShow: { ...c.upcomingShow, applicationsOpen: e.target.checked },
+                      }))
+                    }
+                  />
+                  Applications open
+                </label>
+                <span className="admin-field__hint">
+                  When off, the Apply button appears greyed out and cannot be clicked.
+                </span>
+              </div>
             </div>
             <ArtistsEditor
               artists={content.upcomingShow.artists}

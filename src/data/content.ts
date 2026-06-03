@@ -35,6 +35,7 @@ export const fallbackContent: SiteContent = {
     ctaLabel: 'Get your spot',
     ctaEmailSubject: 'Open Walls Vol. 12 - artist application',
     ctaEmailBody: '',
+    applicationsOpen: true,
   },
   pastShows: [
     {

@@ -29,6 +29,7 @@ type UpcomingShowRow = {
   cta_label: string | null;
   cta_email_subject: string | null;
   cta_email_body: string | null;
+  applications_open: boolean | null;
 };
 
 type PastShowRow = {
@@ -79,6 +80,10 @@ function mapUpcomingShow(row: UpcomingShowRow | null): UpcomingShow {
     ctaLabel: row?.cta_label || fallbackContent.upcomingShow.ctaLabel,
     ctaEmailSubject: row?.cta_email_subject || fallbackContent.upcomingShow.ctaEmailSubject,
     ctaEmailBody: row?.cta_email_body || fallbackContent.upcomingShow.ctaEmailBody,
+    // Treat null as true for backward compatibility with existing rows that
+    // pre-date this column — an older row with no applications_open column
+    // should behave as if applications are open.
+    applicationsOpen: row?.applications_open ?? true,
   };
 }
 
@@ -128,6 +133,7 @@ function upcomingShowPayload(show: UpcomingShow) {
     cta_label: show.ctaLabel,
     cta_email_subject: show.ctaEmailSubject,
     cta_email_body: show.ctaEmailBody,
+    applications_open: show.applicationsOpen,
   };
 }
 

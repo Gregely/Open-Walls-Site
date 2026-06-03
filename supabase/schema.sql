@@ -28,6 +28,9 @@ create table if not exists public.upcoming_show (
   cta_label text not null default 'Get your spot',
   cta_email_subject text not null default '',
   cta_email_body text not null default '',
+  -- Controls whether the Apply button on the public site is active.
+  -- Set to false when applications are closed or the show is full.
+  applications_open boolean not null default true,
   updated_at timestamptz not null default now()
 );
 
@@ -227,7 +230,8 @@ insert into public.upcoming_show (
   artists,
   cta_label,
   cta_email_subject,
-  cta_email_body
+  cta_email_body,
+  applications_open
 ) values (
   'current',
   'Vol. 12',
@@ -240,7 +244,8 @@ insert into public.upcoming_show (
   '["Thady Tra", "Evan Stout", "Andrew Carroll", "Victoria Cialkosz", "Isabel Quinn", "Sachiko Kobayashi", "+ many more"]'::jsonb,
   'Get your spot',
   'Open Walls Vol. 12 - artist application',
-  ''
+  '',
+  true
 ) on conflict (id) do update set
   volume = excluded.volume,
   date = excluded.date,
@@ -252,7 +257,8 @@ insert into public.upcoming_show (
   artists = excluded.artists,
   cta_label = excluded.cta_label,
   cta_email_subject = excluded.cta_email_subject,
-  cta_email_body = excluded.cta_email_body;
+  cta_email_body = excluded.cta_email_body,
+  applications_open = excluded.applications_open;
 
 insert into public.past_shows (id, volume, date, venue, location, artists, notes, display_order, visible, accent, seed, poster_image_url) values
   ('vol-11', 'Vol. 11', 'May 2026', 'Nash 19', 'Princes St', '[]'::jsonb, '', 10, true, '#d94f2b', 12, ''),
