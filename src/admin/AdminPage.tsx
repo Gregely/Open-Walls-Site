@@ -818,6 +818,22 @@ export function AdminPage() {
   const [activeTab, setActiveTab] = useState<AdminTab>(getTabFromHash);
   const [appNewCount, setAppNewCount] = useState(0);
   const [confirmDelete, setConfirmDelete] = useState<PastShow | null>(null);
+  const [confirmReload, setConfirmReload] = useState(false);
+
+  // Mutable ref that always reflects the current dirty status — safe to read
+  // inside async callbacks and event handlers without stale-closure risk.
+  const isDirtyRef = useRef(false);
+
+  const markDirty = () => {
+    isDirtyRef.current = true;
+    setIsDirty(true);
+    setSaveState('idle');
+  };
+
+  const markClean = () => {
+    isDirtyRef.current = false;
+    setIsDirty(false);
+  };
 
   const switchTab = (tab: AdminTab) => {
     setActiveTab(tab);
@@ -826,12 +842,16 @@ export function AdminPage() {
 
   // ── Data loading ──────────────────────────────────────────────────────
 
-  const refreshContent = async () => {
+  // force=true skips the dirty guard (used by the explicit Reload button after confirmation).
+  // force=false (default) silently exits if the user has unsaved edits, so auth events
+  // and automatic callbacks can never overwrite draft content.
+  const refreshContent = async (force = false) => {
+    if (!force && isDirtyRef.current) return;
     setLoading(true);
     setError('');
     const result = await loadContent(true);
     setContent(result.content);
-    setIsDirty(false);
+    markClean();
     setSourceNote(
       result.source === 'fallback'
         ? result.error || 'Showing fallback content.'
@@ -856,33 +876,32 @@ export function AdminPage() {
       }
     });
 
-    const { data: authData } = supabase.auth.onAuthStateChange((event, nextSession) => {
+    const { data: authData } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       setSession(nextSession);
-
-      // Only reload content on a genuine new sign-in.
+      // Do NOT call refreshContent here under any event.
       //
-      // Supabase fires TOKEN_REFRESHED automatically (roughly every hour and
-      // whenever a backgrounded tab regains focus). Treating that event the
-      // same as SIGNED_IN caused refreshContent() to run in the background and
-      // silently overwrite unsaved admin edits — the primary bug reported.
-      if (event === 'SIGNED_IN') {
-        refreshContent();
-      }
-      // SIGNED_OUT, TOKEN_REFRESHED, USER_UPDATED, etc. — do NOT reload content.
+      // SIGNED_IN fires not only on explicit password entry but also whenever
+      // Supabase re-establishes the session after a tab regains focus (the access
+      // token was refreshed in the background). Calling refreshContent() here
+      // overwrites the admin's unsaved draft.
+      //
+      // Content loading is fully covered by:
+      //   • getSession() above — loads content when the page opens with a live session
+      //   • LoginScreen onLogin callback — loads content after an explicit sign-in
+      //
+      // TOKEN_REFRESHED, USER_UPDATED, SIGNED_OUT, INITIAL_SESSION:
+      //   none of these should trigger a content reload.
     });
 
     return () => authData.subscription.unsubscribe();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  // ↑ Deliberately no [session] effect. That pattern triggered refreshContent()
-  //   on every TOKEN_REFRESHED event and wiped out unsaved edits.
 
   // ── Content updates ───────────────────────────────────────────────────
 
   const updateContent = (updater: (draft: SiteContent) => SiteContent) => {
     setContent((current) => updater(current));
-    setSaveState('idle');
-    setIsDirty(true);
+    markDirty();
   };
 
   const handlePastShowUpdate = (updated: PastShow) => {
@@ -917,7 +936,7 @@ export function AdminPage() {
       await saveContent(cleaned);
       setContent(cleaned);
       setSaveState('saved');
-      setIsDirty(false);
+      markClean();
       setLastSaved(new Date());
       setSourceNote('Saved to Supabase.');
     } catch (saveError) {
@@ -947,6 +966,31 @@ export function AdminPage() {
       );
     }
   };
+
+  // ── Reload (with dirty guard) ─────────────────────────────────────────
+
+  const handleReload = () => {
+    if (isDirtyRef.current) {
+      setConfirmReload(true);
+    } else {
+      refreshContent(true);
+    }
+  };
+
+  // ── beforeunload ──────────────────────────────────────────────────────
+  // Warn before leaving the page when there are unsaved edits.
+  // isDirtyRef is used (not isDirty state) so the handler always reads the
+  // current value without being re-registered on every dirty/clean transition.
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (isDirtyRef.current) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Auth guards ───────────────────────────────────────────────────────
 
@@ -993,7 +1037,7 @@ export function AdminPage() {
               <button
                 type="button"
                 className="btn btn--ghost"
-                onClick={refreshContent}
+                onClick={handleReload}
                 disabled={loading || saveState === 'saving'}
               >
                 Reload
@@ -1296,6 +1340,17 @@ export function AdminPage() {
         cancelLabel="Cancel"
         onConfirm={handleConfirmDelete}
         onCancel={() => setConfirmDelete(null)}
+      />
+
+      {/* ── Confirm discard unsaved changes (Reload) ─────────────────── */}
+      <ConfirmDialog
+        isOpen={confirmReload}
+        title="Discard unsaved changes?"
+        message="Reloading will fetch the latest saved content and discard any edits you have not saved yet."
+        confirmLabel="Discard and reload"
+        cancelLabel="Keep editing"
+        onConfirm={() => { setConfirmReload(false); refreshContent(true); }}
+        onCancel={() => setConfirmReload(false)}
       />
     </main>
   );
