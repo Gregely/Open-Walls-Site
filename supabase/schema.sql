@@ -31,6 +31,13 @@ create table if not exists public.upcoming_show (
   -- Controls whether the Apply button on the public site is active.
   -- Set to false when applications are closed or the show is full.
   applications_open boolean not null default true,
+  -- Editable "Find out more" secondary button on the hero section.
+  -- Migration (run in Supabase SQL editor if these columns don't exist yet):
+  --   ALTER TABLE public.upcoming_show
+  --     ADD COLUMN IF NOT EXISTS find_out_more_label text NOT NULL DEFAULT 'Find out more',
+  --     ADD COLUMN IF NOT EXISTS find_out_more_url   text NOT NULL DEFAULT '/#about';
+  find_out_more_label text not null default 'Find out more',
+  find_out_more_url   text not null default '/#about',
   updated_at timestamptz not null default now()
 );
 

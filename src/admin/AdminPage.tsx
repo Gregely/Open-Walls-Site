@@ -1232,6 +1232,21 @@ export function AdminPage() {
                   updateContent((c) => ({ ...c, upcomingShow: { ...c.upcomingShow, ctaLabel: v } }))
                 }
               />
+              <Field
+                label="Find out more — label"
+                value={content.upcomingShow.findOutMoreLabel}
+                onChange={(v) =>
+                  updateContent((c) => ({ ...c, upcomingShow: { ...c.upcomingShow, findOutMoreLabel: v } }))
+                }
+              />
+              <Field
+                label="Find out more — URL"
+                value={content.upcomingShow.findOutMoreUrl}
+                hint="Internal path (e.g. /#about or /updates/vol-20-news) or full external URL (https://…). Leave blank to default to /#about."
+                onChange={(v) =>
+                  updateContent((c) => ({ ...c, upcomingShow: { ...c.upcomingShow, findOutMoreUrl: v } }))
+                }
+              />
               <TextArea
                 label="Description"
                 value={content.upcomingShow.description}

@@ -36,6 +36,8 @@ export const fallbackContent: SiteContent = {
     ctaEmailSubject: 'Open Walls Vol. 12 - artist application',
     ctaEmailBody: '',
     applicationsOpen: true,
+    findOutMoreLabel: 'Find out more',
+    findOutMoreUrl: '/#about',
   },
   pastShows: [
     {

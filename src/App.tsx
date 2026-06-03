@@ -163,6 +163,9 @@ function Hero({ content }: { content: SiteContent }) {
   const { settings, upcomingShow } = content;
   const [titleOne, titleTwo] = splitHeroTitle(settings.heroTitle || upcomingShow.date);
   const venueLine = [upcomingShow.venue, upcomingShow.location].filter(Boolean).join(' · ');
+  const fomUrl = upcomingShow.findOutMoreUrl || '/#about';
+  const fomLabel = upcomingShow.findOutMoreLabel || 'Find out more';
+  const fomExternal = /^https?:\/\//i.test(fomUrl);
 
   return (
     <section className="hero" id="upcoming" aria-labelledby="upcoming-title">
@@ -220,8 +223,12 @@ function Hero({ content }: { content: SiteContent }) {
               {upcomingShow.ctaLabel}
             </button>
           )}
-          <a className="btn btn--ghost" href="#about">
-            Find out more
+          <a
+            className="btn btn--ghost"
+            href={fomUrl}
+            {...(fomExternal ? { target: '_blank', rel: 'noreferrer' } : {})}
+          >
+            {fomLabel}
           </a>
         </div>
 

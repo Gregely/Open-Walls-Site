@@ -24,6 +24,10 @@ export type UpcomingShow = {
   ctaEmailBody: string;
   /** When false the Apply button is greyed out and non-clickable on the public site. */
   applicationsOpen: boolean;
+  /** Label for the secondary "Find out more" button. Falls back to 'Find out more'. */
+  findOutMoreLabel: string;
+  /** Href for the secondary button. Supports internal paths and external URLs. Falls back to '/#about'. */
+  findOutMoreUrl: string;
 };
 
 export type ArtistPromoImage = {
