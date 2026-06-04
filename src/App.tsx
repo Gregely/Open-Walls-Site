@@ -108,11 +108,37 @@ function paragraphs(text: string) {
     .filter(Boolean);
 }
 
+function SiteHeader({ content }: { content: SiteContent }) {
+  const { settings } = content;
+
+  return (
+    <header className="site-header">
+      <a className="site-header__brand" href="#top" aria-label={`${settings.siteName} home`}>
+        <span className="site-header__mark">
+          <MotifStack size={26} seed={88} layers={4} jitter={6} baseRot={-8} />
+        </span>
+        <span>{settings.siteName}</span>
+      </a>
+      <div className="site-header__links">
+        <a href={mailto(settings.contactEmail)}>Email</a>
+        <a href={settings.instagramUrl} target="_blank" rel="noreferrer">
+          Instagram
+        </a>
+        {settings.donateUrl && (
+          <a href={settings.donateUrl} target="_blank" rel="noreferrer">
+            Donate
+          </a>
+        )}
+      </div>
+    </header>
+  );
+}
+
 function Masthead({ content }: { content: SiteContent }) {
   const { settings } = content;
 
   return (
-    <header className="masthead">
+    <div className="masthead">
       <div className="masthead__motifs" aria-hidden="true">
         <PlacedMotif x={82} y={-6}  size={175} seed={14} jitter={8} />
         <PlacedMotif x={-3} y={34}  size={105} seed={37} jitter={9} />
@@ -136,19 +162,8 @@ function Masthead({ content }: { content: SiteContent }) {
             Who We Are
           </a>
         </nav>
-        <div className="masthead__contact">
-          <a href={mailto(settings.contactEmail)}>Email</a>
-          <a href={settings.instagramUrl} target="_blank" rel="noreferrer">
-            Instagram
-          </a>
-          {settings.donateUrl && (
-            <a href={settings.donateUrl} target="_blank" rel="noreferrer">
-              Donate
-            </a>
-          )}
-        </div>
       </div>
-    </header>
+    </div>
   );
 }
 
@@ -504,6 +519,7 @@ function RenderedSite({
 
   return (
     <>
+      <SiteHeader content={content} />
       <Masthead content={content} />
       {fallbackWarning && <div className="content-warning">Showing fallback content. {fallbackWarning}</div>}
       <main id="top">

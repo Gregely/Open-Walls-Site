@@ -45,6 +45,8 @@
   --maxw: 1180px;
   --pad: clamp(20px, 5vw, 64px);
   --reveal-dur: 0.7s;
+  /* Height of the fixed site header — used to offset the content beneath it */
+  --header-h: 48px;
 }
 
 * {
@@ -140,11 +142,74 @@ button:focus-visible {
   color: var(--purple);
 }
 
-/* ── Masthead (replaces the old sticky nav) ──────────────────────────────── */
+/* ── Compact site header (top strip) ─────────────────────────────────────── */
+
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px var(--pad);
+  background: var(--paper);
+  border-bottom: 2px solid var(--ink);
+}
+
+.site-header__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 2vw, 1.4rem);
+  line-height: 1;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.site-header__mark {
+  display: inline-flex;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+}
+
+.site-header__links {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.site-header__links a {
+  padding: 6px 12px;
+  font-family: var(--font-hand);
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.site-header__links a:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* Hide contact links on mobile — they remain in the footer */
+@media (max-width: 720px) {
+  .site-header__links {
+    display: none;
+  }
+}
+
+/* ── Masthead (OPEN WALLS title block) ───────────────────────────────────── */
 
 .masthead {
   position: relative;
-  padding: clamp(44px, 8vh, 88px) var(--pad) clamp(32px, 5vh, 56px);
+  margin-top: var(--header-h);
+  padding: clamp(36px, 6vh, 72px) var(--pad) clamp(28px, 4.5vh, 52px);
   border-bottom: 3px solid var(--ink);
   background: var(--paper);
   overflow: hidden;
@@ -164,9 +229,10 @@ button:focus-visible {
 
 .masthead__title {
   margin: 0;
-  font-size: clamp(4rem, 22vw, 16rem);
+  font-size: clamp(4rem, 17vw, 13rem);
   line-height: 0.9;
   text-transform: uppercase;
+  color: #2b1b26;
   /* Slight tilt for poster personality */
   transform: rotate(-0.6deg);
 }
@@ -227,27 +293,6 @@ button:focus-visible {
   box-shadow: 9px 9px 0 var(--accent);
 }
 
-.masthead__contact {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px 6px;
-  justify-content: center;
-  font-family: var(--font-hand);
-  font-size: 0.9rem;
-  font-weight: 800;
-}
-
-.masthead__contact a {
-  padding: 5px 10px;
-  text-decoration: none;
-  border-bottom: 2px solid transparent;
-  transition: border-color 0.15s, color 0.15s;
-}
-
-.masthead__contact a:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
 
 .masthead__motifs {
   position: absolute;
