@@ -3,10 +3,14 @@ create extension if not exists "uuid-ossp";
 
 create table if not exists public.site_settings (
   id text primary key default 'default',
+  -- site_name  → displayed as the large "OPEN WALLS" masthead title
   site_name text not null,
+  -- tagline    → masthead subtitle shown beneath the title
   tagline text not null default '',
-  hero_title text not null,
-  hero_body text not null,
+  -- hero_title / hero_body are kept for backward compatibility but are no
+  -- longer rendered on the public homepage; do not rely on them for new content.
+  hero_title text not null default '',
+  hero_body text not null default '',
   about_title text not null,
   about_body text not null default '',
   contact_email text not null,
@@ -216,7 +220,7 @@ insert into public.site_settings (
 ) values (
   'default',
   'Open Walls',
-  'Monthly exhibition + maker''s market · Cork',
+  'Monthly exhibition and market in Cork.',
   'Sat 28 June',
   'One room, one day, wall to wall. Twenty-odd Cork artists hang original work, prints and zines beside a maker''s market - with coffee, records and the odd pint. Roll in, look around, take something home.',
   'A wall is just a gallery that hasn''t been asked yet.',

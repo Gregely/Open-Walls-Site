@@ -48,10 +48,8 @@ function isEmail(value: string) {
 
 function validateContent(content: SiteContent) {
   const errors: string[] = [];
-  if (!content.settings.siteName.trim()) errors.push('Site name is required.');
-  if (!content.settings.heroTitle.trim()) errors.push('Hero title is required.');
-  if (!content.settings.heroBody.trim()) errors.push('Hero body is required.');
-  if (!content.settings.aboutTitle.trim()) errors.push('About title is required.');
+  if (!content.settings.siteName.trim()) errors.push('Masthead title is required.');
+  if (!content.settings.aboutTitle.trim()) errors.push('"Who We Are" lead quote is required.');
   if (!content.settings.contactEmail.trim() || !isEmail(content.settings.contactEmail)) {
     errors.push('Contact email must be a valid email address.');
   }
@@ -726,7 +724,7 @@ function AdminTabBar({
       id: 'applications',
       label: appNewCount > 0 ? `Applications (${appNewCount} new)` : 'Applications',
     },
-    { id: 'site-content', label: 'Site Content' },
+    { id: 'site-content', label: 'Masthead / Site' },
     { id: 'upcoming', label: 'Upcoming Show' },
     {
       id: 'past-shows',
@@ -1087,65 +1085,59 @@ export function AdminPage() {
       {/* ── Site Content tab ────────────────────────────────────────── */}
       {activeTab === 'site-content' && (
         <>
+          {/* Masthead */}
           <section className="admin-card">
             <div className="admin-section-title">
-              <h2>Site Text</h2>
-              <span>Homepage wording and footer copy</span>
+              <h2>Masthead</h2>
+              <span>The large title block at the top of the homepage</span>
             </div>
             <div className="admin-grid">
               <Field
-                label="Site name"
+                label="Masthead title"
                 value={content.settings.siteName}
                 required
+                hint='Shown as the big "OPEN WALLS" title. Changing this updates the site name everywhere.'
                 onChange={(v) => updateContent((c) => ({ ...c, settings: { ...c.settings, siteName: v } }))}
               />
               <Field
-                label="Tagline"
+                label="Masthead tagline / subtitle"
                 value={content.settings.tagline}
+                hint='Short line shown beneath the title, e.g. "Monthly exhibition and market in Cork."'
                 onChange={(v) => updateContent((c) => ({ ...c, settings: { ...c.settings, tagline: v } }))}
               />
+            </div>
+          </section>
+
+          {/* Who We Are */}
+          <section className="admin-card">
+            <div className="admin-section-title">
+              <h2>Who We Are</h2>
+              <span>The about / story section at the bottom of the homepage</span>
+            </div>
+            <div className="admin-grid">
               <Field
-                label="Hero title"
-                value={content.settings.heroTitle}
-                required
-                onChange={(v) => updateContent((c) => ({ ...c, settings: { ...c.settings, heroTitle: v } }))}
-              />
-              <TextArea
-                label="Hero body"
-                value={content.settings.heroBody}
-                required
-                rows={4}
-                onChange={(v) => updateContent((c) => ({ ...c, settings: { ...c.settings, heroBody: v } }))}
-              />
-              <Field
-                label="About title"
+                label="Lead quote / heading"
                 value={content.settings.aboutTitle}
                 required
+                hint="Displayed as the large pull-quote heading, e.g. &quot;A wall is just a gallery that hasn&apos;t been asked yet.&quot;"
                 onChange={(v) =>
                   updateContent((c) => ({ ...c, settings: { ...c.settings, aboutTitle: v } }))
                 }
               />
               <TextArea
-                label="About body"
+                label="Body text"
                 value={content.settings.aboutBody}
                 rows={7}
                 onChange={(v) => updateContent((c) => ({ ...c, settings: { ...c.settings, aboutBody: v } }))}
               />
-              <TextArea
-                label="Footer text"
-                value={content.settings.footerText}
-                rows={2}
-                onChange={(v) =>
-                  updateContent((c) => ({ ...c, settings: { ...c.settings, footerText: v } }))
-                }
-              />
             </div>
           </section>
 
+          {/* Contact Links */}
           <section className="admin-card">
             <div className="admin-section-title">
               <h2>Contact Links</h2>
-              <span>{instagramHandle(content.settings.instagramUrl)}</span>
+              <span>Shown in the masthead and the footer</span>
             </div>
             <div className="admin-grid">
               <Field
@@ -1167,9 +1159,27 @@ export function AdminPage() {
               <Field
                 label="Donate URL"
                 value={content.settings.donateUrl}
-                hint="Defaults to https://ko-fi.com/openwalls. Leave blank to hide the Donate button."
+                hint="Leave blank to hide the Donate button."
                 onChange={(v) =>
                   updateContent((c) => ({ ...c, settings: { ...c.settings, donateUrl: v } }))
+                }
+              />
+            </div>
+          </section>
+
+          {/* Footer */}
+          <section className="admin-card">
+            <div className="admin-section-title">
+              <h2>Footer</h2>
+              <span>Small print shown at the bottom of every page</span>
+            </div>
+            <div className="admin-grid">
+              <TextArea
+                label="Footer text"
+                value={content.settings.footerText}
+                rows={2}
+                onChange={(v) =>
+                  updateContent((c) => ({ ...c, settings: { ...c.settings, footerText: v } }))
                 }
               />
             </div>

@@ -140,93 +140,147 @@ button:focus-visible {
   color: var(--purple);
 }
 
-.nav {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  padding: 14px var(--pad);
-  background: color-mix(in srgb, var(--paper) 88%, transparent);
+/* ── Masthead (replaces the old sticky nav) ──────────────────────────────── */
+
+.masthead {
+  position: relative;
+  padding: clamp(44px, 8vh, 88px) var(--pad) clamp(32px, 5vh, 56px);
   border-bottom: 3px solid var(--ink);
-  backdrop-filter: blur(10px);
+  background: var(--paper);
+  overflow: hidden;
 }
 
-.nav__brand {
+.masthead__inner {
+  position: relative;
+  z-index: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
+  text-align: center;
+  gap: clamp(16px, 2.5vh, 24px);
+  max-width: var(--maxw);
+  margin: 0 auto;
+}
+
+.masthead__title {
+  margin: 0;
+  font-size: clamp(4rem, 22vw, 16rem);
+  line-height: 0.9;
+  text-transform: uppercase;
+  /* Slight tilt for poster personality */
+  transform: rotate(-0.6deg);
+}
+
+.masthead__tagline {
+  margin: 0;
+  font-family: var(--font-hand);
+  font-size: clamp(1rem, 2.2vw, 1.35rem);
+  font-weight: 700;
+  color: var(--ink-soft);
+  max-width: 40ch;
+}
+
+.masthead__nav {
+  display: flex;
+  flex-wrap: wrap;
   gap: 12px;
+  justify-content: center;
+  width: 100%;
+  max-width: 800px;
+}
+
+.masthead__nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 auto;
+  min-width: 140px;
+  padding: 13px 22px 15px;
+  border: 3px solid var(--ink);
   font-family: var(--font-display);
-  font-size: clamp(1.15rem, 2.4vw, 1.6rem);
-  line-height: 1;
+  font-size: clamp(0.95rem, 1.8vw, 1.15rem);
   text-decoration: none;
   text-transform: uppercase;
+  min-height: 52px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 5px 5px 0 var(--ink);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.18s ease;
 }
 
-.nav__brand .mark {
-  display: inline-flex;
-  width: 30px;
-  height: 30px;
-  flex: 0 0 auto;
+.masthead__nav-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 9px 9px 0 var(--ink);
+  background: var(--paper-2);
 }
 
-.nav__links {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.nav__links a {
-  position: relative;
-  padding: 7px 13px;
-  border-radius: 999px;
-  font-family: var(--font-hand);
-  font-size: 1rem;
-  font-weight: 800;
-  text-decoration: none;
-  transition: background 0.18s ease, color 0.18s ease;
-}
-
-.nav__links a:hover {
+/* Upcoming Show button: strongest visual weight */
+.masthead__nav-btn--upcoming {
   background: var(--ink);
   color: var(--paper);
+  box-shadow: 5px 5px 0 var(--accent);
 }
 
-.nav__links a.active {
+.masthead__nav-btn--upcoming:hover {
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 9px 9px 0 var(--accent);
+}
+
+.masthead__contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 6px;
+  justify-content: center;
+  font-family: var(--font-hand);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.masthead__contact a {
+  padding: 5px 10px;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.masthead__contact a:hover {
+  border-color: var(--accent);
   color: var(--accent);
 }
 
-.nav__contact {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
+.masthead__motifs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
 }
 
-.nav__contact a {
-  padding: 7px 13px;
-  border-radius: 999px;
-  font-family: var(--font-hand);
-  font-size: 1rem;
-  font-weight: 800;
-  text-decoration: none;
-  transition: background 0.18s ease, color 0.18s ease;
-}
+/* Mobile: 2×2 grid for the four nav buttons; hide larger motifs */
+@media (max-width: 560px) {
+  .masthead__nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
 
-.nav__contact a:hover {
-  background: var(--ink);
-  color: var(--paper);
+  .masthead__nav-btn {
+    min-width: 0;
+  }
+
+  /* Hide the two large corner motifs on narrow screens */
+  .masthead__motifs .stack:nth-child(1),
+  .masthead__motifs .stack:nth-child(3) {
+    display: none;
+  }
 }
 
 .hero {
   position: relative;
   display: flex;
-  min-height: calc(100svh - 64px);
   align-items: center;
   overflow: hidden;
-  padding-block: clamp(44px, 7vh, 90px);
+  padding-block: clamp(56px, 9vh, 110px);
 }
 
 .hero__inner {
@@ -710,7 +764,8 @@ button:focus-visible {
 }
 
 .hero__motifs .stack,
-.footer__motifs .stack {
+.footer__motifs .stack,
+.masthead__motifs .stack {
   position: absolute;
 }
 
@@ -769,13 +824,15 @@ html.anim .reveal.in {
   }
 }
 
-[data-motion="on"] .hero__motifs .stack {
+[data-motion="on"] .hero__motifs .stack,
+[data-motion="on"] .masthead__motifs .stack {
   animation: drift var(--dur, 9s) ease-in-out infinite;
   animation-delay: var(--delay, 0s);
 }
 
 [data-motif="low"] .hero__motifs .stack:nth-child(n + 3),
-[data-motif="low"] .footer__motifs .stack:nth-child(n + 4) {
+[data-motif="low"] .footer__motifs .stack:nth-child(n + 4),
+[data-motif="low"] .masthead__motifs .stack:nth-child(n + 3) {
   display: none;
 }
 
@@ -802,41 +859,6 @@ html.anim .reveal.in {
 }
 
 @media (max-width: 720px) {
-  /* Tighten nav spacing */
-  .nav {
-    gap: 6px;
-    padding-block: 10px;
-    flex-wrap: nowrap; /* keep brand + links on one line */
-    align-items: center;
-  }
-
-  /* Show section links as a compact scrollable row.
-     flex-shrink + min-width:0 lets the container shrink to make room for the brand. */
-  .nav__links {
-    display: flex;
-    gap: 0;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scrollbar-width: none;
-    flex-shrink: 1;
-    min-width: 0;
-  }
-
-  .nav__links::-webkit-scrollbar {
-    display: none;
-  }
-
-  .nav__links a {
-    padding: 7px 10px;
-    font-size: 0.82rem;
-    white-space: nowrap;
-  }
-
-  /* Email/Instagram are already in the footer — hide from mobile sticky nav */
-  .nav__contact {
-    display: none;
-  }
-
   .badge-free {
     display: none;
   }
@@ -913,23 +935,6 @@ html.anim .reveal.in {
 
 /* ── Very narrow phones (iPhone SE, Galaxy A series) ──────────────────── */
 @media (max-width: 380px) {
-  /* Brand text: slightly smaller so it doesn't crowd the nav links */
-  .nav__brand {
-    font-size: 1rem;
-    gap: 8px;
-  }
-
-  .nav__brand .mark {
-    width: 24px;
-    height: 24px;
-  }
-
-  /* Nav links: even tighter so more links fit before scrolling */
-  .nav__links a {
-    padding: 6px 8px;
-    font-size: 0.78rem;
-  }
-
   /* Admin tabs: tightest padding to fit 5 tabs */
   .admin-tab {
     padding-inline: 9px;

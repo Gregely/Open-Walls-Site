@@ -54,33 +54,17 @@ function useProgressiveMotion(content: SiteContent) {
   useEffect(() => {
     const root = document.documentElement;
     const revealEls = Array.from(document.querySelectorAll<HTMLElement>('.reveal'));
-    const sections = ['upcoming', 'updates', 'past', 'about']
-      .map((id) => document.getElementById(id))
-      .filter(Boolean) as HTMLElement[];
-    const navLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('.nav__links a[data-link]'));
 
     root.classList.add('anim');
 
     let pending = false;
     const onScroll = () => {
       const vh = window.innerHeight || document.documentElement.clientHeight;
-
       revealEls.forEach((el) => {
         if (el.classList.contains('in')) return;
         if (el.getBoundingClientRect().top < vh * 0.92) {
           el.classList.add('in');
         }
-      });
-
-      let current = '';
-      const line = vh * 0.4;
-      sections.forEach((section) => {
-        const rect = section.getBoundingClientRect();
-        if (rect.top <= line && rect.bottom > line) current = section.id;
-      });
-
-      navLinks.forEach((link) => {
-        link.classList.toggle('active', link.dataset.link === current);
       });
     };
 
@@ -124,49 +108,53 @@ function paragraphs(text: string) {
     .filter(Boolean);
 }
 
-function Nav({ content }: { content: SiteContent }) {
+function Masthead({ content }: { content: SiteContent }) {
   const { settings } = content;
 
   return (
-    <header className="nav">
-      <a className="nav__brand" href="#top" aria-label={`${settings.siteName} home`}>
-        <span className="mark">
-          <MotifStack size={30} seed={88} layers={4} jitter={6} baseRot={-8} />
-        </span>
-        <span>{settings.siteName}</span>
-      </a>
-      <nav className="nav__links" aria-label="Sections">
-        <a href="#upcoming" data-link="upcoming">
-          Upcoming
-        </a>
-        <a href="#updates" data-link="updates">
-          Updates
-        </a>
-        <a href="#past" data-link="past">
-          Past Shows
-        </a>
-        <a href="#about" data-link="about">
-          About
-        </a>
-      </nav>
-      <div className="nav__contact">
-        <a href={mailto(settings.contactEmail)}>Email</a>
-        <a href={settings.instagramUrl} target="_blank" rel="noreferrer">
-          Instagram
-        </a>
-        {settings.donateUrl && (
-          <a href={settings.donateUrl} target="_blank" rel="noreferrer">
-            Donate
+    <header className="masthead">
+      <div className="masthead__motifs" aria-hidden="true">
+        <PlacedMotif x={82} y={-6}  size={175} seed={14} jitter={8} />
+        <PlacedMotif x={-3} y={34}  size={105} seed={37} jitter={9} />
+        <PlacedMotif x={73} y={66}  size={135} seed={66} jitter={8} />
+        <PlacedMotif x={12} y={58}  size={72}  seed={22} jitter={10} />
+      </div>
+      <div className="wrap masthead__inner">
+        <h1 className="masthead__title display">{settings.siteName}</h1>
+        {settings.tagline && <p className="masthead__tagline">{settings.tagline}</p>}
+        <nav className="masthead__nav" aria-label="Sections">
+          <a className="masthead__nav-btn masthead__nav-btn--upcoming" href="#upcoming">
+            Upcoming Show
           </a>
-        )}
+          <a className="masthead__nav-btn" href="#updates">
+            Updates
+          </a>
+          <a className="masthead__nav-btn" href="#past">
+            Past Shows
+          </a>
+          <a className="masthead__nav-btn" href="#about">
+            Who We Are
+          </a>
+        </nav>
+        <div className="masthead__contact">
+          <a href={mailto(settings.contactEmail)}>Email</a>
+          <a href={settings.instagramUrl} target="_blank" rel="noreferrer">
+            Instagram
+          </a>
+          {settings.donateUrl && (
+            <a href={settings.donateUrl} target="_blank" rel="noreferrer">
+              Donate
+            </a>
+          )}
+        </div>
       </div>
     </header>
   );
 }
 
 function Hero({ content }: { content: SiteContent }) {
-  const { settings, upcomingShow } = content;
-  const [titleOne, titleTwo] = splitHeroTitle(settings.heroTitle || upcomingShow.date);
+  const { upcomingShow } = content;
+  const [titleOne, titleTwo] = splitHeroTitle(upcomingShow.date);
   const venueLine = [upcomingShow.venue, upcomingShow.location].filter(Boolean).join(' · ');
   const fomUrl = upcomingShow.findOutMoreUrl || '/#about';
   const fomLabel = upcomingShow.findOutMoreLabel || 'Find out more';
@@ -193,11 +181,8 @@ function Hero({ content }: { content: SiteContent }) {
       <div className="wrap hero__inner">
         <div className="hero__top">
           <span className="tag reveal">{upcomingShow.volume}</span>
-          <span className="eyebrow reveal" data-d="1">
-            {settings.tagline}
-          </span>
         </div>
-        <h1 id="upcoming-title" className="hero__date display reveal" data-d="1" aria-label={settings.heroTitle}>
+        <h1 id="upcoming-title" className="hero__date display reveal" data-d="1" aria-label={upcomingShow.date}>
           <span className="ln c-red">{titleOne}</span>
           {titleTwo && <span className="ln c-purple">{titleTwo}</span>}
         </h1>
@@ -208,7 +193,7 @@ function Hero({ content }: { content: SiteContent }) {
           {venueLine}
         </div>
         <p className="hero__desc reveal" data-d="3">
-          {settings.heroBody || upcomingShow.description}
+          {upcomingShow.description}
         </p>
         <div className="hero__cta reveal" data-d="3">
           {upcomingShow.applicationsOpen ? (
@@ -236,7 +221,6 @@ function Hero({ content }: { content: SiteContent }) {
             {fomLabel}
           </a>
         </div>
-
       </div>
     </section>
   );
@@ -391,10 +375,11 @@ function About({ content }: { content: SiteContent }) {
   const { settings } = content;
 
   return (
-    <section className="section" id="about" aria-labelledby="about-title">
+    <section className="section" id="about" aria-label="Who We Are">
       <div className="wrap about__grid">
         <div>
-          <h2 id="about-title" className="about__lead display reveal">
+          <span className="tag reveal" style={{ marginBottom: 'clamp(16px, 2.5vh, 24px)', display: 'inline-block' }}>Who We Are</span>
+          <h2 id="about-title" className="about__lead display reveal" data-d="1">
             {settings.aboutTitle}
           </h2>
           <div className="about__body reveal" data-d="1">
@@ -437,7 +422,7 @@ function Footer({ content }: { content: SiteContent }) {
         <nav className="footer__row" aria-label="Footer">
           <a href="#upcoming">Upcoming</a>
           <a href="#past">Past Shows</a>
-          <a href="#about">About</a>
+          <a href="#about">Who We Are</a>
           <a href={mailto(settings.contactEmail)}>{settings.contactEmail}</a>
           <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer">
             {instagramHandle(settings.instagramUrl)}
@@ -519,7 +504,7 @@ function RenderedSite({
 
   return (
     <>
-      <Nav content={content} />
+      <Masthead content={content} />
       {fallbackWarning && <div className="content-warning">Showing fallback content. {fallbackWarning}</div>}
       <main id="top">
         <Hero content={content} />

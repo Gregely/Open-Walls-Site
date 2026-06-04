@@ -3,7 +3,7 @@ import type { SiteContent } from '../types/content';
 export const fallbackContent: SiteContent = {
   settings: {
     siteName: 'Open Walls',
-    tagline: "Monthly exhibition + maker's market · Cork",
+    tagline: 'Monthly exhibition and market in Cork.',
     heroTitle: 'Sat 28 June',
     heroBody:
       "One room, one day, wall to wall. Twenty-odd Cork artists hang original work, prints and zines beside a maker's market - with coffee, records and the odd pint. Roll in, look around, take something home.",
