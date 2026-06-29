@@ -9,6 +9,7 @@ import { MotifStack } from '../components/MotifStack';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { resolveImageUrl, isValidPosterUrl } from '../lib/imageUrl';
 import { ApplicationsSection } from './ApplicationsSection';
+import { ApplicationSettingsPanel } from './ApplicationSettingsPanel';
 import { UpdatesSection } from './UpdatesSection';
 
 // ── Types ─────────────────────────────────────────────────────────────────
@@ -1081,7 +1082,10 @@ export function AdminPage() {
 
       {/* ── Applications tab ────────────────────────────────────────── */}
       {activeTab === 'applications' && (
-        <ApplicationsSection onNewCount={setAppNewCount} />
+        <>
+          <ApplicationSettingsPanel />
+          <ApplicationsSection onNewCount={setAppNewCount} />
+        </>
       )}
 
       {/* ── Site Content tab ────────────────────────────────────────── */}

@@ -2875,3 +2875,110 @@ button:disabled {
   border-bottom: 1px solid var(--grey);
   margin-bottom: 8px;
 }
+
+/* ── Apply: word count ───────────────────────────────────────────────────── */
+
+.apply-word-count {
+  font-family: var(--font-hand);
+  font-weight: 800;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}
+
+.apply-word-count--over {
+  color: var(--red);
+  font-weight: 900;
+}
+
+/* ── Apply: radio group wrap (for 5+ options) ────────────────────────────── */
+
+.apply-radio-group--wrap {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+}
+
+/* ── Apply: guidelines section ───────────────────────────────────────────── */
+
+.apply-intro--guidelines {
+  margin-top: 20px;
+  border-left-color: var(--purple);
+}
+
+/* ── Apply: consent / legal section ─────────────────────────────────────── */
+
+.apply-legal-text {
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  font-family: var(--font-body);
+  border: 2px solid var(--grey);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+
+.apply-legal-text p {
+  margin: 0 0 10px;
+}
+
+.apply-legal-text p:last-child {
+  margin-bottom: 0;
+}
+
+.apply-consent-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  font-family: var(--font-hand);
+  font-weight: 800;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.apply-consent-check input[type='checkbox'] {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  margin-top: 2px;
+  accent-color: var(--purple);
+  cursor: pointer;
+}
+
+.apply-consent-check--error {
+  color: var(--red);
+}
+
+/* ── Admin: application form type badge ──────────────────────────────────── */
+
+.app-card__form-badge {
+  font-family: var(--font-hand);
+  font-weight: 900;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border: 2px solid var(--ink);
+  letter-spacing: 0.03em;
+}
+
+.app-card__form-badge--default {
+  background: var(--paper-2);
+  color: var(--ink-soft);
+}
+
+.app-card__form-badge--wandesford {
+  background: var(--purple);
+  color: var(--paper);
+  border-color: var(--purple);
+}
+
+/* ── Admin: secondary (form type) filter row ─────────────────────────────── */
+
+.app-filter--secondary {
+  margin-top: -10px;
+  padding-bottom: 4px;
+}
+
+.app-filter--secondary .app-filter__btn {
+  font-size: 0.88rem;
+  padding: 5px 11px;
+}

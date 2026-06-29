@@ -1,12 +1,12 @@
 import { supabase } from './supabase';
-import type { Application, ApplicationStatus, NewApplicationData } from '../types/application';
+import type { Application, ApplicationStatus, SubmitApplicationPayload } from '../types/application';
 
 /**
- * Submit a new artist application from the public /apply form.
+ * Submit an application from either the default or Wandesford form.
  * Anonymous users are allowed to INSERT via RLS policy.
  * Empty optional strings are stored as NULL.
  */
-export async function submitApplication(data: NewApplicationData): Promise<void> {
+export async function submitApplication(data: SubmitApplicationPayload): Promise<void> {
   if (!supabase) {
     throw new Error('Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to .env.');
   }
@@ -14,12 +14,15 @@ export async function submitApplication(data: NewApplicationData): Promise<void>
     name: data.name.trim(),
     phone_number: data.phone_number.trim(),
     email: data.email.trim().toLowerCase(),
-    art_type: data.art_type.trim() || null,
-    work_size_or_count: data.work_size_or_count.trim() || null,
-    display_method: data.display_method.trim() || null,
+    art_type: data.art_type?.trim() || null,
+    work_size_or_count: data.work_size_or_count?.trim() || null,
+    display_method: data.display_method?.trim() || null,
     wants_social_promotion: data.wants_social_promotion || null,
-    social_username: data.social_username.trim() || null,
-    other_ideas_or_questions: data.other_ideas_or_questions.trim() || null,
+    social_username: data.social_username?.trim() || null,
+    other_ideas_or_questions: data.other_ideas_or_questions?.trim() || null,
+    form_type: data.form_type,
+    attendee_type: data.attendee_type,
+    answers: data.answers,
   };
   const { error } = await supabase.from('applications').insert(payload);
   if (error) throw error;

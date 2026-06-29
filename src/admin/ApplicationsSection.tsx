@@ -8,6 +8,7 @@ import {
 } from '../lib/applicationApi';
 import type { Application, ApplicationStatus } from '../types/application';
 import { APPLICATION_STATUSES } from '../types/application';
+import { WANDESFORD_ATTENDEE_TYPES } from '../types/applicationSettings';
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 
@@ -15,6 +16,28 @@ const STATUS_FILTER_OPTIONS = [
   { value: 'all' as const, label: 'All' },
   ...APPLICATION_STATUSES,
 ];
+
+type TypeFilter =
+  | 'all'
+  | 'default'
+  | 'wandesford'
+  | typeof WANDESFORD_ATTENDEE_TYPES[number];
+
+const TYPE_FILTER_OPTIONS: { value: TypeFilter; label: string }[] = [
+  { value: 'all', label: 'All forms' },
+  { value: 'default', label: 'Default' },
+  { value: 'wandesford', label: 'Wandesford' },
+  ...WANDESFORD_ATTENDEE_TYPES.map((t) => ({ value: t as TypeFilter, label: t })),
+];
+
+function matchesTypeFilter(app: Application, filter: TypeFilter): boolean {
+  if (filter === 'all') return true;
+  const formType = app.form_type ?? 'default';
+  const attendeeType = app.attendee_type ?? '';
+  if (filter === 'default') return formType === 'default';
+  if (filter === 'wandesford') return formType === 'wandesford';
+  return attendeeType === filter;
+}
 
 function formatDate(iso: string) {
   try {
@@ -36,6 +59,26 @@ function copyToClipboard(text: string) {
   });
 }
 
+const ANSWER_LABELS: Record<string, string> = {
+  socials: 'Socials',
+  description: 'Description',
+  bio: 'Bio',
+  reference_link: 'Reference link',
+  setup_requirements: 'Setup / space requirements',
+  video_link: 'Video link',
+  duration: 'Duration',
+  technical_needs: 'Technical needs',
+  reference_link_optional: 'Reference link (optional)',
+  attendee_count: 'Number of attendees',
+  materials: 'Materials',
+  charge: 'Charge',
+  charge_amount: 'Charge amount',
+};
+
+function answerLabel(key: string): string {
+  return ANSWER_LABELS[key] ?? key.replace(/_/g, ' ');
+}
+
 // ── ApplicationCard ───────────────────────────────────────────────────────
 
 type CardProps = {
@@ -51,7 +94,6 @@ function ApplicationCard({ app, onStatusChange, onNotesSaved, onDeleteRequest }:
   const [statusSaving, setStatusSaving] = useState(false);
   const [copied, setCopied] = useState<'email' | 'phone' | null>(null);
 
-  // Sync notes from parent (e.g. after a reload)
   useEffect(() => {
     setNotes(app.organiser_notes ?? '');
   }, [app.organiser_notes]);
@@ -82,14 +124,29 @@ function ApplicationCard({ app, onStatusChange, onNotesSaved, onDeleteRequest }:
     }
   };
 
+  const formType = app.form_type ?? 'default';
+  const attendeeType = app.attendee_type ?? '';
+  const answers = app.answers ?? {};
+  const isWandesford = formType === 'wandesford';
+
   return (
     <article className="app-card" data-status={app.status}>
-      {/* Header row: name, date, art type, status, delete */}
+      {/* Header row */}
       <div className="app-card__header">
         <div className="app-card__meta">
           <strong className="app-card__name">{app.name}</strong>
           <span className="app-card__date">{formatDate(app.created_at)}</span>
-          {app.art_type && <span className="app-card__art-type">{app.art_type}</span>}
+          {/* Form type badge */}
+          <span className={`app-card__form-badge app-card__form-badge--${formType}`}>
+            {isWandesford ? 'Wandesford' : 'Default'}
+          </span>
+          {/* Attendee type (Wandesford) or art type (default) */}
+          {isWandesford && attendeeType && (
+            <span className="app-card__art-type">{attendeeType}</span>
+          )}
+          {!isWandesford && app.art_type && (
+            <span className="app-card__art-type">{app.art_type}</span>
+          )}
         </div>
         <div className="app-card__controls">
           <select
@@ -115,7 +172,7 @@ function ApplicationCard({ app, onStatusChange, onNotesSaved, onDeleteRequest }:
         </div>
       </div>
 
-      {/* Contact row: email + phone with copy buttons */}
+      {/* Contact row */}
       <div className="app-card__contacts">
         <span className="app-card__contact-item">
           <span className="app-card__contact-label">Email:</span>
@@ -145,37 +202,59 @@ function ApplicationCard({ app, onStatusChange, onNotesSaved, onDeleteRequest }:
         </span>
       </div>
 
-      {/* Answers: only render non-empty optional fields */}
-      {(app.work_size_or_count || app.display_method || app.wants_social_promotion || app.other_ideas_or_questions) && (
-        <div className="app-card__answers">
-          {app.work_size_or_count && (
-            <div className="app-card__answer">
-              <span className="app-card__answer-label">Work size / count</span>
-              <p className="app-card__answer-text">{app.work_size_or_count}</p>
-            </div>
-          )}
-          {app.display_method && (
-            <div className="app-card__answer">
-              <span className="app-card__answer-label">Display method</span>
-              <p className="app-card__answer-text">{app.display_method}</p>
-            </div>
-          )}
-          {app.wants_social_promotion && (
-            <div className="app-card__answer">
-              <span className="app-card__answer-label">Social promotion</span>
-              <p className="app-card__answer-text">
-                {app.wants_social_promotion}
-                {app.social_username ? ` — ${app.social_username}` : ''}
-              </p>
-            </div>
-          )}
-          {app.other_ideas_or_questions && (
-            <div className="app-card__answer">
-              <span className="app-card__answer-label">Ideas / questions</span>
-              <p className="app-card__answer-text">{app.other_ideas_or_questions}</p>
-            </div>
-          )}
-        </div>
+      {/* Answers */}
+      {isWandesford ? (
+        // Wandesford: render structured answers from JSON
+        Object.keys(answers).length > 0 && (
+          <div className="app-card__answers">
+            {Object.entries(answers).map(([key, value]) => {
+              const text = String(value ?? '');
+              if (!text) return null;
+              return (
+                <div key={key} className="app-card__answer">
+                  <span className="app-card__answer-label">{answerLabel(key)}</span>
+                  <p className="app-card__answer-text">{text}</p>
+                </div>
+              );
+            })}
+          </div>
+        )
+      ) : (
+        // Default form: render the fixed columns
+        (app.work_size_or_count ||
+          app.display_method ||
+          app.wants_social_promotion ||
+          app.other_ideas_or_questions) && (
+          <div className="app-card__answers">
+            {app.work_size_or_count && (
+              <div className="app-card__answer">
+                <span className="app-card__answer-label">Work size / count</span>
+                <p className="app-card__answer-text">{app.work_size_or_count}</p>
+              </div>
+            )}
+            {app.display_method && (
+              <div className="app-card__answer">
+                <span className="app-card__answer-label">Display method</span>
+                <p className="app-card__answer-text">{app.display_method}</p>
+              </div>
+            )}
+            {app.wants_social_promotion && (
+              <div className="app-card__answer">
+                <span className="app-card__answer-label">Social promotion</span>
+                <p className="app-card__answer-text">
+                  {app.wants_social_promotion}
+                  {app.social_username ? ` — ${app.social_username}` : ''}
+                </p>
+              </div>
+            )}
+            {app.other_ideas_or_questions && (
+              <div className="app-card__answer">
+                <span className="app-card__answer-label">Ideas / questions</span>
+                <p className="app-card__answer-text">{app.other_ideas_or_questions}</p>
+              </div>
+            )}
+          </div>
+        )
       )}
 
       {/* Organiser notes */}
@@ -214,10 +293,10 @@ export function ApplicationsSection({ onNewCount }: { onNewCount?: (count: numbe
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [statusFilter, setStatusFilter] = useState<ApplicationStatus | 'all'>('all');
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
   const [loadTick, setLoadTick] = useState(0);
   const [confirmDelete, setConfirmDelete] = useState<Application | null>(null);
 
-  // Load all applications; client-side filter by status
   useEffect(() => {
     let alive = true;
     setLoading(true);
@@ -237,7 +316,9 @@ export function ApplicationsSection({ onNewCount }: { onNewCount?: (count: numbe
     };
   }, [loadTick]);
 
-  const displayed = statusFilter === 'all' ? apps : apps.filter((a) => a.status === statusFilter);
+  const filtered = apps
+    .filter((a) => statusFilter === 'all' || a.status === statusFilter)
+    .filter((a) => matchesTypeFilter(a, typeFilter));
 
   const handleStatusChange = async (id: string, status: ApplicationStatus) => {
     try {
@@ -251,10 +332,12 @@ export function ApplicationsSection({ onNewCount }: { onNewCount?: (count: numbe
   const handleNotesSaved = async (id: string, notes: string) => {
     try {
       await updateApplicationNotes(id, notes);
-      setApps((prev) => prev.map((a) => (a.id === id ? { ...a, organiser_notes: notes.trim() || null } : a)));
+      setApps((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, organiser_notes: notes.trim() || null } : a)),
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not save notes.');
-      throw err; // re-throw so the card resets its save state
+      throw err;
     }
   };
 
@@ -272,7 +355,6 @@ export function ApplicationsSection({ onNewCount }: { onNewCount?: (count: numbe
 
   const newCount = apps.filter((a) => a.status === 'new').length;
 
-  // Report new-application count to parent (used for the tab label)
   useEffect(() => {
     onNewCount?.(newCount);
   }, [newCount, onNewCount]);
@@ -286,7 +368,7 @@ export function ApplicationsSection({ onNewCount }: { onNewCount?: (count: numbe
             {newCount > 0 && <span className="app-new-badge">{newCount} new</span>}
           </h2>
           <span>
-            {loading ? 'Loading…' : `${displayed.length} ${statusFilter === 'all' ? 'total' : statusFilter}`}
+            {loading ? 'Loading…' : `${filtered.length} shown`}
           </span>
         </div>
 
@@ -313,19 +395,32 @@ export function ApplicationsSection({ onNewCount }: { onNewCount?: (count: numbe
           </button>
         </div>
 
+        {/* Form / attendee type filter */}
+        <div className="app-filter app-filter--secondary">
+          {TYPE_FILTER_OPTIONS.map(({ value, label }) => (
+            <button
+              key={value}
+              type="button"
+              className={`app-filter__btn${typeFilter === value ? ' app-filter__btn--active' : ''}`}
+              onClick={() => setTypeFilter(value)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
         {error && <div className="admin-error admin-error--bar">{error}</div>}
 
-        {!loading && displayed.length === 0 && (
+        {!loading && filtered.length === 0 && (
           <p className="admin-muted" style={{ marginTop: '16px' }}>
-            {statusFilter === 'all'
+            {apps.length === 0
               ? 'No applications yet. Share the /apply link when the next show opens!'
-              : `No applications with status "${statusFilter}".`}
+              : 'No applications match the current filters.'}
           </p>
         )}
 
-        {/* Application cards */}
         <div className="app-list">
-          {displayed.map((app) => (
+          {filtered.map((app) => (
             <ApplicationCard
               key={app.id}
               app={app}
