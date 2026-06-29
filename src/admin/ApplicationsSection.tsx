@@ -79,6 +79,101 @@ function answerLabel(key: string): string {
   return ANSWER_LABELS[key] ?? key.replace(/_/g, ' ');
 }
 
+// ── CSV export ────────────────────────────────────────────────────────────
+
+function csvEscape(value: string): string {
+  const str = String(value ?? '');
+  if (str.includes('"') || str.includes(',') || str.includes('\n') || str.includes('\r')) {
+    return '"' + str.replace(/"/g, '""') + '"';
+  }
+  return str;
+}
+
+const CSV_HEADERS = [
+  'Submitted At',
+  'Status',
+  'Form Type',
+  'Attendee Type',
+  'Full Name',
+  'Email',
+  'Contact Number',
+  'Admin Notes',
+  'Art Type',
+  'Work Size/Quantity',
+  'Display Method',
+  'Promotion Consent',
+  'Instagram Username',
+  'Other Ideas/Questions',
+  'Socials',
+  'Description',
+  'Bio',
+  'Reference Link',
+  'Video Link',
+  'Duration',
+  'Technical Needs',
+  'Reference Link Optional',
+  'Setup/Space Requirements',
+  'Number of Attendees',
+  'Materials',
+  'Charge',
+  'Charge Amount',
+  'Application ID',
+];
+
+function appToCsvRow(app: Application): string[] {
+  const answers = (app.answers ?? {}) as Record<string, unknown>;
+  const ans = (key: string) => String(answers[key] ?? '');
+  return [
+    app.created_at
+      ? new Date(app.created_at).toISOString().replace('T', ' ').slice(0, 16)
+      : '',
+    app.status,
+    app.form_type ?? 'default',
+    app.attendee_type ?? '',
+    app.name,
+    app.email,
+    app.phone_number,
+    app.organiser_notes ?? '',
+    app.art_type ?? '',
+    app.work_size_or_count ?? '',
+    app.display_method ?? '',
+    app.wants_social_promotion ?? '',
+    app.social_username ?? '',
+    app.other_ideas_or_questions ?? '',
+    ans('socials'),
+    ans('description'),
+    ans('bio'),
+    ans('reference_link'),
+    ans('video_link'),
+    ans('duration'),
+    ans('technical_needs'),
+    ans('reference_link_optional'),
+    ans('setup_requirements'),
+    ans('attendee_count'),
+    ans('materials'),
+    ans('charge'),
+    ans('charge_amount'),
+    app.id,
+  ];
+}
+
+function buildCSV(apps: Application[]): string {
+  const lines = [
+    CSV_HEADERS.map(csvEscape).join(','),
+    ...apps.map((app) => appToCsvRow(app).map(csvEscape).join(',')),
+  ];
+  return '﻿' + lines.join('\r\n');
+}
+
+function buildFilename(
+  statusFilter: ApplicationStatus | 'all',
+  typeFilter: TypeFilter,
+): string {
+  const today = new Date().toISOString().slice(0, 10);
+  const filterSlug = `${statusFilter}-${typeFilter.replace(/\s+/g, '-').toLowerCase()}`;
+  return `open-walls-applications-${filterSlug}-${today}.csv`;
+}
+
 // ── ApplicationCard ───────────────────────────────────────────────────────
 
 type CardProps = {
@@ -359,6 +454,19 @@ export function ApplicationsSection({ onNewCount }: { onNewCount?: (count: numbe
     onNewCount?.(newCount);
   }, [newCount, onNewCount]);
 
+  const handleExport = () => {
+    const csv = buildCSV(filtered);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = buildFilename(statusFilter, typeFilter);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <>
       <section className="admin-card">
@@ -407,6 +515,18 @@ export function ApplicationsSection({ onNewCount }: { onNewCount?: (count: numbe
               {label}
             </button>
           ))}
+        </div>
+
+        {/* Export */}
+        <div style={{ marginTop: 8, display: 'flex', justifyContent: 'flex-end' }}>
+          <button
+            type="button"
+            className="admin-mini-btn"
+            onClick={handleExport}
+            disabled={filtered.length === 0}
+          >
+            Export current view CSV
+          </button>
         </div>
 
         {error && <div className="admin-error admin-error--bar">{error}</div>}
