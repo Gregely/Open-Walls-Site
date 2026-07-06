@@ -1946,6 +1946,9 @@ button:disabled {
   display: grid;
   gap: 14px;
   padding: 16px 18px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 /* Left border colour reflects status */
@@ -1969,6 +1972,8 @@ button:disabled {
   align-items: baseline;
   flex-wrap: wrap;
   gap: 8px 14px;
+  flex: 1;
+  min-width: 0;
 }
 
 .app-card__name {
@@ -2032,6 +2037,7 @@ button:disabled {
   font-family: var(--font-hand);
   font-weight: 800;
   font-size: 0.95rem;
+  min-width: 0;
 }
 
 .app-card__contact-label {
