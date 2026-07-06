@@ -409,7 +409,7 @@ function ArtMarketFields({
       <ApplyField
         id="w-reference_link"
         label="Reference image / documentation link"
-        hint="Paste a permanent link to up to 3 images, or a folder containing them — Google Drive, Dropbox, or similar. Make sure it's set to 'Anyone with the link can view'."
+        hint="Paste a permanent link to up to 3 images, or a folder containing them — Google Drive, Dropbox, or similar. Make sure it's set to 'Anyone with the link can view'. Please don't use WeTransfer links or other link types which expire."
         error={errors.reference_link}
       >
         <TextInput id="w-reference_link" value={fields.reference_link} onChange={set('reference_link')} placeholder="https://..." hasError={!!errors.reference_link} />
@@ -441,7 +441,7 @@ function InstallationFields({
       <ApplyField
         id="w-reference_link"
         label="Reference image / documentation link"
-        hint="Paste a permanent link to up to 3 images, or a folder containing them — Google Drive, Dropbox, or similar. Make sure it's set to 'Anyone with the link can view'."
+        hint="Paste a permanent link to up to 3 images, or a folder containing them — Google Drive, Dropbox, or similar. Make sure it's set to 'Anyone with the link can view'. Please don't use WeTransfer links or other link types which expire."
         error={errors.reference_link}
       >
         <TextInput id="w-reference_link" value={fields.reference_link} onChange={set('reference_link')} placeholder="https://..." hasError={!!errors.reference_link} />
@@ -481,7 +481,7 @@ function VideoFields({
       <ApplyField
         id="w-video_link"
         label="Video segment link"
-        hint="Paste a permanent link to your video segment — Vimeo, YouTube, Google Drive, Dropbox, or similar. If linking a downloadable file, please keep it under 50 MB. Make sure it's publicly accessible."
+        hint="Paste a permanent link to your video segment — Vimeo, YouTube, Google Drive, Dropbox, or similar. If linking a downloadable file, please keep it under 50 MB. Make sure it's publicly accessible. Please don't use WeTransfer links or other link types which expire."
         error={errors.video_link}
       >
         <TextInput id="w-video_link" value={fields.video_link} onChange={set('video_link')} placeholder="https://..." hasError={!!errors.video_link} />
@@ -524,7 +524,7 @@ function PerformanceFields({
       <ApplyField
         id="w-reference_link_optional"
         label="Reference video / audio / documentation link"
-        hint="Paste a permanent link to any supporting material — Vimeo, YouTube, SoundCloud, Google Drive, or similar. (optional)"
+        hint="Paste a permanent link to any supporting material — Vimeo, YouTube, SoundCloud, Google Drive, or similar. Please don't use WeTransfer links or other link types which expire. (optional)"
       >
         <TextInput id="w-reference_link_optional" value={fields.reference_link_optional} onChange={set('reference_link_optional')} placeholder="https://..." />
       </ApplyField>
