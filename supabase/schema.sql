@@ -352,3 +352,41 @@ using (true)
 with check (true);
 
 -- ── End updates table ──────────────────────────────────────────────────────
+
+-- ── Application settings table ────────────────────────────────────────────
+-- Added June 2026. Run in Supabase SQL editor if it does not exist yet:
+--
+--   create table if not exists public.application_settings (
+--     id                      text    primary key default 'default',
+--     applications_open       boolean not null default true,
+--     active_form             text    not null default 'default',
+--     default_intro           text    not null default 'Placeholder intro text. Replace this in admin.',
+--     default_closed_message  text    not null default 'Placeholder closed message. Replace this in admin.',
+--     wandesford_intro        text    not null default 'Placeholder event description. Replace this in admin.',
+--     wandesford_guidelines   text    not null default 'Placeholder application guidelines. Replace this in admin.',
+--     wandesford_legal_text   text    not null default 'Placeholder consent text. Replace this in admin.',
+--     wandesford_closed_message text  not null default 'Placeholder closed message. Replace this in admin.'
+--   );
+--   alter table public.application_settings enable row level security;
+--   create policy "Public can read application settings"
+--     on public.application_settings for select to anon, authenticated using (true);
+--   create policy "Authenticated users can manage application settings"
+--     on public.application_settings for all to authenticated using (true) with check (true);
+--
+-- ── Applications table new columns (June 2026) ────────────────────────────
+-- Run if applications table predates this migration:
+--
+--   alter table public.applications
+--     add column if not exists form_type     text  not null default 'default',
+--     add column if not exists attendee_type text  not null default '',
+--     add column if not exists answers       jsonb not null default '{}'::jsonb;
+--
+-- ── Application settings: per-category text columns (July 2026) ───────────
+-- Run in Supabase SQL editor to add per-category info text fields:
+
+--   alter table public.application_settings
+--     add column if not exists wandesford_art_market_text  text not null default 'Placeholder Art Market information. Replace this in admin.',
+--     add column if not exists wandesford_installation_text text not null default 'Placeholder Installation information. Replace this in admin.',
+--     add column if not exists wandesford_video_text       text not null default 'Placeholder Video information. Replace this in admin.',
+--     add column if not exists wandesford_performance_text text not null default 'Placeholder Performance information. Replace this in admin.',
+--     add column if not exists wandesford_workshop_text    text not null default 'Placeholder Workshop information. Replace this in admin.';

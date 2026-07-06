@@ -212,6 +212,51 @@ export function ApplicationSettingsPanel() {
                 />
               </div>
 
+              {/* Per-category info text */}
+              <div className="admin-section-title" style={{ marginBottom: 8, marginTop: 24 }}>
+                <h3 style={{ margin: 0, fontSize: '1rem' }}>Category-specific information text</h3>
+              </div>
+              <p className="admin-muted" style={{ marginBottom: 16 }}>
+                Shown on the public form when the applicant selects that category, above the category fields. Leave blank to hide.
+              </p>
+              <div className="admin-grid">
+                <TextArea
+                  label="Art Market info"
+                  value={settings.wandesfordArtMarketText}
+                  rows={4}
+                  hint="Shown above Art Market fields when that category is selected."
+                  onChange={(v) => patch({ wandesfordArtMarketText: v })}
+                />
+                <TextArea
+                  label="Installation info"
+                  value={settings.wandesfordInstallationText}
+                  rows={4}
+                  hint="Shown above Installation fields when that category is selected."
+                  onChange={(v) => patch({ wandesfordInstallationText: v })}
+                />
+                <TextArea
+                  label="Video info"
+                  value={settings.wandesfordVideoText}
+                  rows={4}
+                  hint="Shown above Video fields when that category is selected."
+                  onChange={(v) => patch({ wandesfordVideoText: v })}
+                />
+                <TextArea
+                  label="Performance info"
+                  value={settings.wandesfordPerformanceText}
+                  rows={4}
+                  hint="Shown above Performance fields when that category is selected."
+                  onChange={(v) => patch({ wandesfordPerformanceText: v })}
+                />
+                <TextArea
+                  label="Workshop info"
+                  value={settings.wandesfordWorkshopText}
+                  rows={4}
+                  hint="Shown above Workshop fields when that category is selected."
+                  onChange={(v) => patch({ wandesfordWorkshopText: v })}
+                />
+              </div>
+
               {saveState === 'error' && saveError && (
                 <p className="admin-error" style={{ marginTop: 12 }}>{saveError}</p>
               )}

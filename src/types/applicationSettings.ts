@@ -19,6 +19,12 @@ export type ApplicationSettings = {
   wandesfordGuidelines: string;
   wandesfordLegalText: string;
   wandesfordClosedMessage: string;
+  // Per-category info text shown above each category's fields on the public form.
+  wandesfordArtMarketText: string;
+  wandesfordInstallationText: string;
+  wandesfordVideoText: string;
+  wandesfordPerformanceText: string;
+  wandesfordWorkshopText: string;
 };
 
 export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
@@ -30,4 +36,9 @@ export const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
   wandesfordGuidelines: 'Placeholder application guidelines. Replace this in admin.',
   wandesfordLegalText: 'Placeholder consent text. Replace this in admin.',
   wandesfordClosedMessage: 'Placeholder closed message. Replace this in admin.',
+  wandesfordArtMarketText: 'Placeholder Art Market information. Replace this in admin.',
+  wandesfordInstallationText: 'Placeholder Installation information. Replace this in admin.',
+  wandesfordVideoText: 'Placeholder Video information. Replace this in admin.',
+  wandesfordPerformanceText: 'Placeholder Performance information. Replace this in admin.',
+  wandesfordWorkshopText: 'Placeholder Workshop information. Replace this in admin.',
 };

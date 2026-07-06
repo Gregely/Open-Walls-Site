@@ -14,6 +14,12 @@ type ApplicationSettingsRow = {
   wandesford_guidelines: string | null;
   wandesford_legal_text: string | null;
   wandesford_closed_message: string | null;
+  // Per-category text — null on rows that pre-date this column being added.
+  wandesford_art_market_text: string | null;
+  wandesford_installation_text: string | null;
+  wandesford_video_text: string | null;
+  wandesford_performance_text: string | null;
+  wandesford_workshop_text: string | null;
 };
 
 function mapRow(row: ApplicationSettingsRow | null): ApplicationSettings {
@@ -27,6 +33,11 @@ function mapRow(row: ApplicationSettingsRow | null): ApplicationSettings {
     wandesfordGuidelines: row?.wandesford_guidelines ?? d.wandesfordGuidelines,
     wandesfordLegalText: row?.wandesford_legal_text ?? d.wandesfordLegalText,
     wandesfordClosedMessage: row?.wandesford_closed_message ?? d.wandesfordClosedMessage,
+    wandesfordArtMarketText: row?.wandesford_art_market_text ?? d.wandesfordArtMarketText,
+    wandesfordInstallationText: row?.wandesford_installation_text ?? d.wandesfordInstallationText,
+    wandesfordVideoText: row?.wandesford_video_text ?? d.wandesfordVideoText,
+    wandesfordPerformanceText: row?.wandesford_performance_text ?? d.wandesfordPerformanceText,
+    wandesfordWorkshopText: row?.wandesford_workshop_text ?? d.wandesfordWorkshopText,
   };
 }
 
@@ -58,6 +69,11 @@ export async function saveApplicationSettings(settings: ApplicationSettings): Pr
     wandesford_guidelines: settings.wandesfordGuidelines,
     wandesford_legal_text: settings.wandesfordLegalText,
     wandesford_closed_message: settings.wandesfordClosedMessage,
+    wandesford_art_market_text: settings.wandesfordArtMarketText,
+    wandesford_installation_text: settings.wandesfordInstallationText,
+    wandesford_video_text: settings.wandesfordVideoText,
+    wandesford_performance_text: settings.wandesfordPerformanceText,
+    wandesford_workshop_text: settings.wandesfordWorkshopText,
   };
   const { error } = await supabase
     .from('application_settings')

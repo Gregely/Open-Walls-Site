@@ -31,6 +31,17 @@ function paragraphs(text: string) {
     .filter(Boolean);
 }
 
+function CategoryInfoBlock({ text }: { text: string }) {
+  if (!text.trim()) return null;
+  return (
+    <div className="apply-intro apply-intro--category">
+      {paragraphs(text).map((p) => (
+        <p key={p}>{p}</p>
+      ))}
+    </div>
+  );
+}
+
 // ── Field helpers ─────────────────────────────────────────────────────────
 
 function isEmail(v: string) {
@@ -690,6 +701,13 @@ export function WandesfordForm({
             )}
           </fieldset>
         </div>
+
+        {/* Selected category info text — shown directly below the type selector */}
+        {attendeeType === 'Art Market' && <CategoryInfoBlock text={settings.wandesfordArtMarketText} />}
+        {attendeeType === 'Installation' && <CategoryInfoBlock text={settings.wandesfordInstallationText} />}
+        {attendeeType === 'Video' && <CategoryInfoBlock text={settings.wandesfordVideoText} />}
+        {attendeeType === 'Performance' && <CategoryInfoBlock text={settings.wandesfordPerformanceText} />}
+        {attendeeType === 'Workshop' && <CategoryInfoBlock text={settings.wandesfordWorkshopText} />}
 
         {/* Shared required fields — always shown */}
         <ApplyField id="w-name" label="Full name" required error={errors.name}>

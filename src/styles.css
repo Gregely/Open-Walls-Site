@@ -2905,6 +2905,14 @@ button:disabled {
   border-left-color: var(--purple);
 }
 
+/* ── Apply: per-category info block (shown inside Wandesford form) ───────── */
+
+.apply-intro--category {
+  margin-top: 24px;
+  margin-bottom: 4px;
+  border-left-color: var(--red);
+}
+
 /* ── Apply: consent / legal section ─────────────────────────────────────── */
 
 .apply-legal-text {
