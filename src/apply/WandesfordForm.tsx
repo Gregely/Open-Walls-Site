@@ -57,7 +57,7 @@ type WandesfordFields = {
   name: string;
   email: string;
   contact_number: string;
-  // Shared optional
+  // Shared
   socials: string;
   // Most types: description + bio + primary reference
   description: string;
@@ -124,12 +124,55 @@ function validate(
 
   if (!attendeeType) return errors;
 
+  if (!fields.socials.trim()) errors.socials = 'Please enter your socials or a link to your work.';
+
   if (attendeeType === 'Workshop') {
-    if (countWords(fields.description_workshop) > 50)
+    if (!fields.description_workshop.trim())
+      errors.description_workshop = 'Please describe your workshop.';
+    else if (countWords(fields.description_workshop) > 50)
       errors.description_workshop = 'Please shorten your description to 50 words.';
+    if (!fields.bio.trim())
+      errors.bio = 'Please enter a bio.';
+    if (!fields.attendee_count.trim())
+      errors.attendee_count = 'Please enter the approximate number of attendees.';
+    if (!fields.materials.trim())
+      errors.materials = "Please describe the materials you'll bring or use.";
+    if (!fields.charge)
+      errors.charge = 'Please indicate whether you will charge attendees.';
+    if (fields.charge === 'yes' && !fields.charge_amount.trim())
+      errors.charge_amount = 'Please enter the charge amount.';
+    if (!fields.technical_needs_ws.trim())
+      errors.technical_needs_ws = 'Please describe any extra technical needs, or enter "none".';
+    if (!fields.duration_ws.trim())
+      errors.duration_ws = 'Please enter the workshop duration.';
   } else {
-    if (countWords(fields.description) > 100)
+    if (!fields.description.trim())
+      errors.description = 'Please enter a description of your work.';
+    else if (countWords(fields.description) > 100)
       errors.description = 'Please shorten your description to 100 words.';
+    if (!fields.bio.trim())
+      errors.bio = 'Please enter a bio.';
+    if (attendeeType === 'Art Market') {
+      if (!fields.reference_link.trim())
+        errors.reference_link = 'Please add a reference image link.';
+    }
+    if (attendeeType === 'Installation') {
+      if (!fields.reference_link.trim())
+        errors.reference_link = 'Please add a reference image link.';
+      if (!fields.setup_requirements.trim())
+        errors.setup_requirements = 'Please describe your setup or space requirements.';
+    }
+    if (attendeeType === 'Video') {
+      if (!fields.video_link.trim())
+        errors.video_link = 'Please add your video segment link.';
+    }
+    if (attendeeType === 'Performance') {
+      if (!fields.duration_perf.trim())
+        errors.duration_perf = 'Please enter the duration of your performance.';
+      if (!fields.technical_needs_perf.trim())
+        errors.technical_needs_perf = 'Please describe any extra technical needs, or enter "none".';
+      // reference_link_optional is intentionally not required
+    }
   }
 
   if (countWords(fields.bio) > 50)
@@ -193,14 +236,12 @@ function buildAnswers(
 function ApplyField({
   id,
   label,
-  required,
   hint,
   error,
   children,
 }: {
   id?: string;
   label: string;
-  required?: boolean;
   hint?: string;
   error?: string;
   children: React.ReactNode;
@@ -209,7 +250,6 @@ function ApplyField({
     <div className="apply-field">
       <label className="apply-field__label" htmlFor={id}>
         {label}
-        {required && <span className="apply-required" aria-label="required"> *</span>}
       </label>
       {hint && <span className="apply-field__hint">{hint}</span>}
       {children}
@@ -289,8 +329,8 @@ function SharedFields({
 }) {
   return (
     <>
-      <ApplyField id="w-socials" label="Socials" hint="Instagram, website, or any relevant link (optional)">
-        <TextInput id="w-socials" value={fields.socials} onChange={set('socials')} placeholder="@yourhandle or https://..." />
+      <ApplyField id="w-socials" label="Socials" hint="Instagram, website, or any relevant link" error={errors.socials}>
+        <TextInput id="w-socials" value={fields.socials} onChange={set('socials')} placeholder="@yourhandle or https://..." hasError={!!errors.socials} />
       </ApplyField>
     </>
   );
@@ -369,9 +409,10 @@ function ArtMarketFields({
       <ApplyField
         id="w-reference_link"
         label="Reference image / documentation link"
-        hint="Paste a permanent link to up to 3 images, or a folder containing them — Google Drive, Dropbox, or similar. Make sure it's set to 'Anyone with the link can view'. (Optional)"
+        hint="Paste a permanent link to up to 3 images, or a folder containing them — Google Drive, Dropbox, or similar. Make sure it's set to 'Anyone with the link can view'."
+        error={errors.reference_link}
       >
-        <TextInput id="w-reference_link" value={fields.reference_link} onChange={set('reference_link')} placeholder="https://..." />
+        <TextInput id="w-reference_link" value={fields.reference_link} onChange={set('reference_link')} placeholder="https://..." hasError={!!errors.reference_link} />
       </ApplyField>
     </>
   );
@@ -400,16 +441,18 @@ function InstallationFields({
       <ApplyField
         id="w-reference_link"
         label="Reference image / documentation link"
-        hint="Paste a permanent link to up to 3 images, or a folder containing them — Google Drive, Dropbox, or similar. Make sure it's set to 'Anyone with the link can view'. (Optional)"
+        hint="Paste a permanent link to up to 3 images, or a folder containing them — Google Drive, Dropbox, or similar. Make sure it's set to 'Anyone with the link can view'."
+        error={errors.reference_link}
       >
-        <TextInput id="w-reference_link" value={fields.reference_link} onChange={set('reference_link')} placeholder="https://..." />
+        <TextInput id="w-reference_link" value={fields.reference_link} onChange={set('reference_link')} placeholder="https://..." hasError={!!errors.reference_link} />
       </ApplyField>
       <ApplyField
         id="w-setup_requirements"
         label="Setup / space requirements"
-        hint="Briefly describe any simple space requirements if relevant. (Optional)"
+        hint="Briefly describe your space requirements."
+        error={errors.setup_requirements}
       >
-        <TextArea id="w-setup_requirements" value={fields.setup_requirements} onChange={set('setup_requirements')} rows={3} />
+        <TextArea id="w-setup_requirements" value={fields.setup_requirements} onChange={set('setup_requirements')} rows={3} hasError={!!errors.setup_requirements} />
       </ApplyField>
     </>
   );
@@ -438,9 +481,10 @@ function VideoFields({
       <ApplyField
         id="w-video_link"
         label="Video segment link"
-        hint="Paste a permanent link to your video segment — Vimeo, YouTube, Google Drive, Dropbox, or similar. If linking a downloadable file, please keep it under 50 MB. Make sure it's publicly accessible. (Optional)"
+        hint="Paste a permanent link to your video segment — Vimeo, YouTube, Google Drive, Dropbox, or similar. If linking a downloadable file, please keep it under 50 MB. Make sure it's publicly accessible."
+        error={errors.video_link}
       >
-        <TextInput id="w-video_link" value={fields.video_link} onChange={set('video_link')} placeholder="https://..." />
+        <TextInput id="w-video_link" value={fields.video_link} onChange={set('video_link')} placeholder="https://..." hasError={!!errors.video_link} />
       </ApplyField>
     </>
   );
@@ -466,20 +510,21 @@ function PerformanceFields({
         descriptionId="w-description"
         descriptionKey="description"
       />
-      <ApplyField id="w-duration_perf" label="Duration" hint="e.g. 15 minutes, 30 minutes (Optional)">
-        <TextInput id="w-duration_perf" value={fields.duration_perf} onChange={set('duration_perf')} placeholder="e.g. 20 minutes" />
+      <ApplyField id="w-duration_perf" label="Duration" hint="e.g. 15 minutes, 30 minutes" error={errors.duration_perf}>
+        <TextInput id="w-duration_perf" value={fields.duration_perf} onChange={set('duration_perf')} placeholder="e.g. 20 minutes" hasError={!!errors.duration_perf} />
       </ApplyField>
       <ApplyField
         id="w-technical_needs_perf"
         label="Extra technical needs"
-        hint="e.g. PA system, projector, microphone. This means technical needs, not materials you'll bring. (Optional)"
+        hint="e.g. PA system, projector, microphone. This means technical needs, not materials you'll bring."
+        error={errors.technical_needs_perf}
       >
-        <TextArea id="w-technical_needs_perf" value={fields.technical_needs_perf} onChange={set('technical_needs_perf')} rows={3} />
+        <TextArea id="w-technical_needs_perf" value={fields.technical_needs_perf} onChange={set('technical_needs_perf')} rows={3} hasError={!!errors.technical_needs_perf} />
       </ApplyField>
       <ApplyField
         id="w-reference_link_optional"
         label="Reference video / audio / documentation link"
-        hint="Paste a permanent link to any supporting material — Vimeo, YouTube, SoundCloud, Google Drive, or similar. (Optional)"
+        hint="Paste a permanent link to any supporting material — Vimeo, YouTube, SoundCloud, Google Drive, or similar. (optional)"
       >
         <TextInput id="w-reference_link_optional" value={fields.reference_link_optional} onChange={set('reference_link_optional')} placeholder="https://..." />
       </ApplyField>
@@ -507,11 +552,27 @@ function WorkshopFields({
         descriptionId="w-description_workshop"
         descriptionKey="description_workshop"
       />
-      <ApplyField id="w-attendee_count" label="Number of attendees" hint="Approximate number of people the workshop is for (Optional)">
-        <TextInput id="w-attendee_count" value={fields.attendee_count} onChange={set('attendee_count')} placeholder="e.g. 10–15" />
+      <ApplyField
+        id="w-attendee_count"
+        label="Number of attendees"
+        hint="Approximate number of people the workshop is for"
+        error={errors.attendee_count}
+      >
+        <TextInput
+          id="w-attendee_count"
+          value={fields.attendee_count}
+          onChange={set('attendee_count')}
+          placeholder="e.g. 10–15"
+          hasError={!!errors.attendee_count}
+        />
       </ApplyField>
-      <ApplyField id="w-materials" label="Materials brought / used" hint="List materials you'll bring or that attendees will need. (Optional)">
-        <TextArea id="w-materials" value={fields.materials} onChange={set('materials')} rows={3} />
+      <ApplyField
+        id="w-materials"
+        label="Materials brought / used"
+        hint="List materials you'll bring or that attendees will need."
+        error={errors.materials}
+      >
+        <TextArea id="w-materials" value={fields.materials} onChange={set('materials')} rows={3} hasError={!!errors.materials} />
       </ApplyField>
       <div className="apply-field">
         <fieldset className="apply-fieldset">
@@ -530,22 +591,40 @@ function WorkshopFields({
               </label>
             ))}
           </div>
+          {errors.charge && (
+            <span className="apply-error-msg" role="alert">
+              {errors.charge}
+            </span>
+          )}
         </fieldset>
       </div>
       {fields.charge === 'yes' && (
-        <ApplyField id="w-charge_amount" label="If yes, how much?">
-          <TextInput id="w-charge_amount" value={fields.charge_amount} onChange={set('charge_amount')} placeholder="e.g. €5 per person" />
+        <ApplyField id="w-charge_amount" label="If yes, how much?" error={errors.charge_amount}>
+          <TextInput
+            id="w-charge_amount"
+            value={fields.charge_amount}
+            onChange={set('charge_amount')}
+            placeholder="e.g. €5 per person"
+            hasError={!!errors.charge_amount}
+          />
         </ApplyField>
       )}
       <ApplyField
         id="w-technical_needs_ws"
         label="Extra technical needs"
-        hint="e.g. projector, screen, whiteboard. This means technical needs, not materials you'll bring. (Optional)"
+        hint="e.g. projector, screen, whiteboard. This means technical needs, not materials you'll bring."
+        error={errors.technical_needs_ws}
       >
-        <TextArea id="w-technical_needs_ws" value={fields.technical_needs_ws} onChange={set('technical_needs_ws')} rows={3} />
+        <TextArea id="w-technical_needs_ws" value={fields.technical_needs_ws} onChange={set('technical_needs_ws')} rows={3} hasError={!!errors.technical_needs_ws} />
       </ApplyField>
-      <ApplyField id="w-duration_ws" label="Duration" hint="e.g. 1 hour, 90 minutes (Optional)">
-        <TextInput id="w-duration_ws" value={fields.duration_ws} onChange={set('duration_ws')} placeholder="e.g. 1 hour" />
+      <ApplyField id="w-duration_ws" label="Duration" hint="e.g. 1 hour, 90 minutes" error={errors.duration_ws}>
+        <TextInput
+          id="w-duration_ws"
+          value={fields.duration_ws}
+          onChange={set('duration_ws')}
+          placeholder="e.g. 1 hour"
+          hasError={!!errors.duration_ws}
+        />
       </ApplyField>
     </>
   );
@@ -676,9 +755,7 @@ export function WandesfordForm({
         {/* Attendee type */}
         <div className="apply-field">
           <fieldset className="apply-fieldset">
-            <legend className="apply-field__label">
-              Attendee type <span className="apply-required" aria-label="required">*</span>
-            </legend>
+            <legend className="apply-field__label">Attendee type</legend>
             <span className="apply-field__hint">Select the section you are applying for.</span>
             <div className="apply-radio-group apply-radio-group--wrap" role="radiogroup" id="w-attendeeType">
               {WANDESFORD_ATTENDEE_TYPES.map((type) => (
@@ -710,7 +787,7 @@ export function WandesfordForm({
         {attendeeType === 'Workshop' && <CategoryInfoBlock text={settings.wandesfordWorkshopText} />}
 
         {/* Shared required fields — always shown */}
-        <ApplyField id="w-name" label="Full name" required error={errors.name}>
+        <ApplyField id="w-name" label="Full name" error={errors.name}>
           <TextInput
             id="w-name"
             value={fields.name}
@@ -720,7 +797,7 @@ export function WandesfordForm({
           />
         </ApplyField>
 
-        <ApplyField id="w-email" label="Email" required error={errors.email}>
+        <ApplyField id="w-email" label="Email" error={errors.email}>
           <TextInput
             id="w-email"
             type="email"
@@ -731,7 +808,7 @@ export function WandesfordForm({
           />
         </ApplyField>
 
-        <ApplyField id="w-contact_number" label="Contact number" required error={errors.contact_number}>
+        <ApplyField id="w-contact_number" label="Contact number" error={errors.contact_number}>
           <TextInput
             id="w-contact_number"
             type="tel"
@@ -742,7 +819,7 @@ export function WandesfordForm({
           />
         </ApplyField>
 
-        {/* Socials — shared optional */}
+        {/* Socials — shared */}
         <SharedFields fields={fields} errors={errors} set={set} />
 
         {/* Conditional fields by attendee type */}
