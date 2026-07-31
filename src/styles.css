@@ -2996,3 +2996,236 @@ button:disabled {
   font-size: 0.88rem;
   padding: 5px 11px;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   NEWSLETTER
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Homepage newsletter section ────────────────────────────────────────── */
+
+.newsletter-section {
+  position: relative;
+  background: var(--paper);
+  border-top: 3px solid var(--ink);
+  border-bottom: 3px solid var(--ink);
+  padding-block: clamp(36px, 6vh, 72px);
+  overflow: hidden;
+}
+
+.newsletter-section__motifs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Position motif stacks absolutely within the motifs container */
+.newsletter-section__motifs .stack {
+  position: absolute;
+  opacity: 0.18;
+}
+
+[data-motion="on"] .newsletter-section__motifs .stack {
+  animation: drift var(--dur, 9s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.newsletter-section__wrap {
+  position: relative;
+  z-index: 1;
+}
+
+.newsletter-section__inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(28px, 5vw, 72px);
+  align-items: center;
+  background: var(--paper-2);
+  border: 3px solid var(--ink);
+  border-left-width: 7px;
+  border-left-color: var(--purple);
+  box-shadow: 5px 5px 0 var(--ink);
+  padding: clamp(24px, 4vw, 48px);
+}
+
+.newsletter-section__copy {
+  min-width: 0;
+}
+
+.newsletter-section__heading {
+  margin: 0 0 12px;
+  font-size: clamp(1.8rem, 4vw, 3.2rem);
+  line-height: 1;
+  color: var(--ink);
+}
+
+.newsletter-section__sub {
+  margin: 0;
+  font-size: clamp(0.95rem, 1.8vw, 1.05rem);
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+
+.newsletter-section__form-col {
+  min-width: 0;
+}
+
+/* ── Subscribe form ──────────────────────────────────────────────────────── */
+
+.newsletter-form {
+  display: grid;
+  gap: 10px;
+}
+
+.newsletter-form__field {
+  display: grid;
+  gap: 6px;
+}
+
+.newsletter-form__label {
+  font-family: var(--font-hand);
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.newsletter-form__input {
+  width: 100%;
+  border: 3px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  padding: 10px 14px;
+  box-shadow: 3px 3px 0 var(--grey);
+  outline: none;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+
+.newsletter-form__input::placeholder {
+  color: var(--grey);
+}
+
+.newsletter-form__input:focus {
+  border-color: var(--purple);
+  box-shadow: 3px 3px 0 var(--purple);
+}
+
+.newsletter-form__input--error {
+  border-color: var(--red);
+  box-shadow: 3px 3px 0 var(--red);
+}
+
+.newsletter-form__error {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--red);
+  font-family: var(--font-hand);
+  font-weight: 700;
+}
+
+.newsletter-form__btn {
+  width: 100%;
+}
+
+.newsletter-form__disclaimer {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}
+
+/* ── Success / already subscribed state ──────────────────────────────────── */
+
+.newsletter-done {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 20px 22px;
+  border: 3px solid var(--green);
+  background: var(--paper-2);
+  box-shadow: 3px 3px 0 var(--green);
+}
+
+.newsletter-done__icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--green);
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.newsletter-done__msg {
+  margin: 0;
+  font-family: var(--font-hand);
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+/* ── Mobile ──────────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .newsletter-section__inner {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Admin: newsletter stat box ──────────────────────────────────────────── */
+
+.newsletter-stat-box {
+  display: inline-grid;
+  gap: 4px;
+  padding: 12px 20px;
+  border: 3px solid var(--ink);
+  background: var(--paper-2);
+  box-shadow: 3px 3px 0 var(--ink);
+  margin-bottom: 20px;
+}
+
+.newsletter-stat-box__label {
+  font-family: var(--font-hand);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
+
+.newsletter-stat-box__count {
+  font-size: 2.2rem;
+  line-height: 1;
+  color: var(--ink);
+}
+
+/* ── Admin: update editor newsletter send section ────────────────────────── */
+
+.update-nl-section {
+  border-top: 2px solid var(--paper-2);
+  margin-top: 20px;
+  padding-top: 16px;
+}
+
+.update-nl-section--muted {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.update-nl-section__label {
+  font-family: var(--font-hand);
+  font-weight: 900;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.update-nl-section__success {
+  margin: 8px 0 0;
+  font-family: var(--font-hand);
+  font-weight: 700;
+  color: var(--green);
+}

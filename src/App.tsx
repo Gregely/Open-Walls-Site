@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { Analytics } from '@vercel/analytics/react';
 import { MotifStack } from './components/MotifStack';
+import { NewsletterSection } from './components/NewsletterSection';
 import { AdminPage } from './admin/AdminPage';
 import { ApplyPage } from './apply/ApplyPage';
 import { PastShowArchivePage } from './past/PastShowArchivePage';
@@ -54,7 +55,7 @@ function useProgressiveMotion(content: SiteContent) {
   useEffect(() => {
     const root = document.documentElement;
     const revealEls = Array.from(document.querySelectorAll<HTMLElement>('.reveal'));
-    const sections = ['upcoming', 'updates', 'past', 'about']
+    const sections = ['upcoming', 'newsletter', 'past', 'about']
       .map((id) => document.getElementById(id))
       .filter(Boolean) as HTMLElement[];
     const navLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('.nav__links a[data-link]'));
@@ -139,7 +140,7 @@ function Nav({ content }: { content: SiteContent }) {
         <a href="#upcoming" data-link="upcoming">
           Upcoming
         </a>
-        <a href="#updates" data-link="updates">
+        <a href="#newsletter" data-link="newsletter">
           Updates
         </a>
         <a href="#past" data-link="past">
@@ -524,6 +525,7 @@ function RenderedSite({
       <main id="top">
         <Hero content={content} />
         <MotifDivider />
+        <NewsletterSection />
         <UpdatesSection updates={updates} />
         <PastShows content={content} />
         <About content={content} />

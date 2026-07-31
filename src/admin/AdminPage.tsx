@@ -11,13 +11,14 @@ import { resolveImageUrl, isValidPosterUrl } from '../lib/imageUrl';
 import { ApplicationsSection } from './ApplicationsSection';
 import { ApplicationSettingsPanel } from './ApplicationSettingsPanel';
 import { UpdatesSection } from './UpdatesSection';
+import { NewsletterPanel } from './NewsletterPanel';
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
 type SaveState = 'idle' | 'saving' | 'saved';
-type AdminTab = 'applications' | 'site-content' | 'upcoming' | 'past-shows' | 'updates';
+type AdminTab = 'applications' | 'site-content' | 'upcoming' | 'past-shows' | 'updates' | 'newsletter';
 
-const VALID_TABS: AdminTab[] = ['applications', 'site-content', 'upcoming', 'past-shows', 'updates'];
+const VALID_TABS: AdminTab[] = ['applications', 'site-content', 'upcoming', 'past-shows', 'updates', 'newsletter'];
 
 function getTabFromHash(): AdminTab {
   const hash = window.location.hash.slice(1) as AdminTab;
@@ -734,6 +735,7 @@ function AdminTabBar({
       label: showCount > 0 ? `Past Shows (${showCount})` : 'Past Shows',
     },
     { id: 'updates', label: 'Updates' },
+    { id: 'newsletter', label: 'Newsletter' },
   ];
 
   return (
@@ -1013,7 +1015,8 @@ export function AdminPage() {
 
   // Updates has its own per-item save; Applications has no save. Only show
   // the top-header Reload/Save buttons for the three content-editing tabs.
-  const isContentTab = activeTab === 'site-content' || activeTab === 'upcoming' || activeTab === 'past-shows';
+  const isContentTab =
+    activeTab === 'site-content' || activeTab === 'upcoming' || activeTab === 'past-shows';
 
   // Button label for the top-header save button
   const saveLabel =
@@ -1358,6 +1361,9 @@ export function AdminPage() {
 
       {/* ── Updates tab ─────────────────────────────────────────────── */}
       {activeTab === 'updates' && <UpdatesSection />}
+
+      {/* ── Newsletter tab ───────────────────────────────────────────── */}
+      {activeTab === 'newsletter' && <NewsletterPanel />}
 
       {/* ── Confirm delete past show ─────────────────────────────────── */}
       <ConfirmDialog

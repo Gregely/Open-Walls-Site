@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { resolveImageUrl } from '../lib/imageUrl';
 import { deleteUpdate, loadAllUpdates, saveUpdate, slugify } from '../lib/updatesApi';
+import { hasSupabaseConfig, supabase } from '../lib/supabase';
 import type { Update } from '../types/update';
 
 // ── Blank update factory ──────────────────────────────────────────────────
@@ -67,6 +68,125 @@ function TextArea({
       <textarea rows={rows} value={value} onChange={(e) => onChange(e.target.value)} />
       {hint && <span className="admin-field__hint">{hint}</span>}
     </label>
+  );
+}
+
+// ── Newsletter send section (inside UpdateEditor) ─────────────────────────
+
+type NlStatus = 'idle' | 'sending' | 'sent' | 'error';
+
+function NewsletterSendSection({ update }: { update: Update }) {
+  const [subject, setSubject] = useState(update.title);
+  const [preview, setPreview] = useState('');
+  const [nlStatus, setNlStatus] = useState<NlStatus>('idle');
+  const [nlError, setNlError] = useState('');
+
+  // Keep default subject in sync with title if the user hasn't changed it.
+  const [subjectTouched, setSubjectTouched] = useState(false);
+  useEffect(() => {
+    if (!subjectTouched) setSubject(update.title);
+  }, [update.title, subjectTouched]);
+
+  const handleSend = async () => {
+    if (!hasSupabaseConfig || !supabase) {
+      setNlError('Supabase is not configured.');
+      setNlStatus('error');
+      return;
+    }
+    setNlStatus('sending');
+    setNlError('');
+    const { data, error } = await supabase.functions.invoke('send-newsletter', {
+      body: {
+        subject: subject.trim() || update.title,
+        previewText: preview.trim() || undefined,
+        title: update.title,
+        imageUrl: update.imageUrl || undefined,
+        body: update.body,
+        ctaLabel: update.ctaLabel || undefined,
+        ctaUrl: update.ctaUrl || undefined,
+        slug: update.slug,
+      },
+    });
+    if (error) {
+      setNlStatus('error');
+      setNlError(error.message || 'Could not send newsletter.');
+      return;
+    }
+    const result = data as { status?: string; error?: string };
+    if (result.error) {
+      setNlStatus('error');
+      setNlError(result.error);
+    } else {
+      setNlStatus('sent');
+    }
+  };
+
+  if (!update.published || !update.slug) {
+    return (
+      <div className="update-nl-section update-nl-section--muted">
+        <span className="update-nl-section__label">Newsletter</span>
+        <p className="admin-muted" style={{ margin: 0, fontSize: '0.88rem' }}>
+          Publish this update and give it a slug before sending a newsletter.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="update-nl-section">
+      <div className="admin-section-title" style={{ marginBottom: 10 }}>
+        <h3 style={{ margin: 0, fontSize: '0.95rem' }}>Send as Newsletter</h3>
+      </div>
+      <p className="admin-muted" style={{ margin: '0 0 12px', fontSize: '0.88rem' }}>
+        Creates and immediately sends a MailerLite campaign to all subscribers. Only send once — MailerLite does not deduplicate sends.
+      </p>
+      <div className="admin-grid">
+        <label className="admin-field">
+          <span>Email subject</span>
+          <input
+            type="text"
+            value={subject}
+            onChange={(e) => { setSubject(e.target.value); setSubjectTouched(true); }}
+            placeholder={update.title}
+          />
+          <span className="admin-field__hint">Defaults to the update title.</span>
+        </label>
+        <label className="admin-field">
+          <span>Preview text (optional)</span>
+          <input
+            type="text"
+            value={preview}
+            onChange={(e) => setPreview(e.target.value)}
+            placeholder="Short summary shown in email clients before opening"
+          />
+        </label>
+      </div>
+
+      {nlStatus === 'sent' && (
+        <p className="update-nl-section__success">
+          Newsletter sent successfully via MailerLite.
+        </p>
+      )}
+      {nlStatus === 'error' && nlError && (
+        <p className="admin-error" style={{ margin: '8px 0 0' }}>{nlError}</p>
+      )}
+
+      <div style={{ marginTop: 12 }}>
+        <button
+          type="button"
+          className="btn btn--ghost"
+          onClick={handleSend}
+          disabled={nlStatus === 'sending' || nlStatus === 'sent'}
+          aria-busy={nlStatus === 'sending'}
+        >
+          {nlStatus === 'sending'
+            ? 'Sending…'
+            : nlStatus === 'sent'
+            ? 'Sent ✓'
+            : 'Send to subscribers'}
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -147,6 +267,8 @@ function UpdateEditor({
             hint="Plain text. Use blank lines to separate paragraphs."
             onChange={(v) => patch({ body: v })}
           />
+
+          <NewsletterSendSection update={update} />
 
           <div className="past-editor__footer">
             <label className="admin-check">

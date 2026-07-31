@@ -390,3 +390,26 @@ with check (true);
 --     add column if not exists wandesford_video_text       text not null default 'Placeholder Video information. Replace this in admin.',
 --     add column if not exists wandesford_performance_text text not null default 'Placeholder Performance information. Replace this in admin.',
 --     add column if not exists wandesford_workshop_text    text not null default 'Placeholder Workshop information. Replace this in admin.';
+
+-- ── Newsletter settings table (July 2026) ────────────────────────────────
+-- Run in Supabase SQL editor:
+--
+--   create table if not exists public.newsletter_settings (
+--     id                          text    primary key default 'default',
+--     heading                     text    not null default 'Stay Updated',
+--     subheading                  text    not null default 'Hear about exhibitions, artist opportunities, workshops and community events.',
+--     success_message             text    not null default 'You''re subscribed! We''ll let you know when there''s something worth sharing.',
+--     already_subscribed_message  text    not null default 'You are already subscribed.',
+--     failure_message             text    not null default 'Something went wrong. Please try again.',
+--     button_text                 text    not null default 'Subscribe',
+--     disclaimer                  text    not null default 'No spam. Unsubscribe anytime.',
+--     updated_at                  timestamptz not null default now()
+--   );
+--
+--   alter table public.newsletter_settings enable row level security;
+--
+--   create policy "Public can read newsletter settings"
+--     on public.newsletter_settings for select to anon, authenticated using (true);
+--
+--   create policy "Authenticated users can manage newsletter settings"
+--     on public.newsletter_settings for all to authenticated using (true) with check (true);
